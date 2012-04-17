@@ -1,8 +1,9 @@
 # myapp.rb
 require 'sinatra'
+use Rack::Logger
 
 configure :development do
-  set :logging, Rack::Logger::DEBUG
+  set :logging, Logger::DEBUG
 end
 
 get '/' do
