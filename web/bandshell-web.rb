@@ -1,4 +1,4 @@
-# myapp.rb
+# bandshell-web.rb
 require 'sinatra'
 use Rack::Logger
 
@@ -7,6 +7,12 @@ configure :development do
 end
 
 get '/' do
-  logger.info "Saying hello..."
-  'Hello world!'
+  erb :home
+end
+
+post '/' do
+  server_address_file = "server.cfg"
+  File.open(server_address_file, 'w') do |f|
+    f.write params[:server_address]
+  end
 end
