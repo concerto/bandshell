@@ -1,3 +1,17 @@
+#Bandshell Library Methods
+
+#Set server address / get server information
+#Request Temporary ID
+#Request Real ID (based on a Temporary ID we already have)
+#Check Configuration (based on our Real Instance ID)
+#Get Status
+#Force Reboot
+
+#force reboot
+def force_system_reboot
+  system("reboot")
+end
+
 #write given server info to given filename
 def set_server_info(filename,server_info)
   File.open(filename, 'w') do |f|
