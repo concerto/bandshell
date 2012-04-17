@@ -2,6 +2,11 @@
 require 'sinatra'
 use Rack::Logger
 
+require 'rubygems'
+require 'sys/uptime'
+require 'sys/proctable'
+include Sys
+
 #set global locations for config files (accessed with settings.{name})
 set :instance_id_file, 'instance_id'
 set :server_info_file, 'server_info'
@@ -65,7 +70,9 @@ post '/configure' do
 end
 
 #Shows uptime,firmware version, and general system and process information
+#Requires ffi, sys-uptime, and sys-proctable gems
 get '/status' do
+  @proctable = ProcTable.ps
   erb :player_status
 end
 
