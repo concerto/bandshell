@@ -1,8 +1,9 @@
 # bandshell-web.rb
 require 'sinatra'
+require 'rubygems'
 use Rack::Logger
 
-require 'rubygems'
+#includes for system status functions
 require 'sys/uptime'
 require 'sys/proctable'
 include Sys
