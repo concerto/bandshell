@@ -1,0 +1,20 @@
+= Concerto Bandshell
+
+Bandshell is an optional part of the {Concerto}{http://www.github.com/concerto/concerto} Digital Signage system (v2). It interfaces with Concerto's API to manage installation and configuration of a screen, and then takes over for local management of firmware and configuration updates, and day-to-day operation of the browser viewer.
+
+Bandshell has three main components:
+
+* A local daemon that boots with the PC, starts the webserver and browser, and controls firmware updates, configuration updates, and screen on/off commands if available.
+* A local webserver for initial configuration, browser redirection, and status reporting.
+* A command-line utility for convenient access to the same initial configuration and status reporting functions available through the local webserver.
+
+== Development Status
+
+This code is in the very early stages of development, so don't expect it to be particularly useful just yet.
+
+== Documentation
+
+Further documentation on this software will be stored in the Bandshell wiki on github (link forthcoming). For general Concerto v2 Documentation, see the {Concerto Wiki}{http://github.com/concerto/concerto/wiki}
+
+The public website for Concerto is at http://www.concerto-signage.org.
+
