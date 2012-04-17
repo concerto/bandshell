@@ -22,7 +22,7 @@ end
 
 get '/screen' do
   if File.exists?(settings.instance_id_file)
-    instance  = get_instance_id
+    instance  = get_instance_id(settings.instance_id_file)
     #if instance is non-nil, direct user to instance
     if instance != ""
       redirect '/'
@@ -38,7 +38,7 @@ end
 
 get '/configure' do
   if File.exists?(settings.server_info_file)
-    server_info  = get_server_info
+    server_info  = get_server_info(settings.server_info_file)
     
     #if the file is empty-send the user off to the server info form
     if server_info == ""
@@ -46,7 +46,7 @@ get '/configure' do
     else
       #read instance id from file
       if File.exists?(settings.server_info_file)
-        instance = get_instance_id
+        instance = get_instance_id(settings.instance_id_file)
       end
       if instance != ""
         #download configuration info
@@ -64,9 +64,7 @@ end
 
 #Accept a post request and read the server info into the globablly specified file
 post '/configure' do
-  File.open(settings.server_info_file, 'w') do |f|
-    f.write params[:server_address]
-  end
+  set_server_info(settings.server_info_file,params[:server_address])
   redirect '/configure'
 end
 
@@ -83,26 +81,4 @@ get '/force_update' do
     instance = get_instance_id
   end
   #using the instance id, request the instance info from the webserver now
-end
-
-#return the contents of the instance id file and error if it's not found
-def get_instance_id
-  begin
-    f = File.open(settings.instance_id_file,'r')
-    instance  = f.read
-    return instance
-  rescue Errno::ENOENT
-    puts "Instance file not found!"
-  end
-end
-
-#return the contents of the server info file and error if it's not found
-def get_server_info
-  begin
-    f = File.open(settings.server_info_file,'r')
-    server_info  = f.read
-    return server_info
-  rescue Errno::ENOENT
-    puts "Server info file not found!"
-  end
 end
