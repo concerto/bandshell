@@ -4,8 +4,17 @@ require 'json'
 require './netconfig'
 
 CONFIG_FILE='/tmp/netconfig.json'
+PASSWORD_FILE='/tmp/concerto_password'
 CONNECTION_METHODS = [ WiredConnection, WirelessConnection ]
 ADDRESSING_METHODS = [ DHCPAddressing, StaticAddressing ]
+
+begin
+    PASSWORD = File.open(PASSWORD_FILE) do |f|
+        f.read
+    end
+rescue Errno::ENOENT
+    PASSWORD = 'default'
+end
 
 helpers do
     def value_from(obj, method)
@@ -15,9 +24,22 @@ helpers do
             ""
         end
     end
+
+    def protected!
+        unless authorized?
+            response['WWW-Authenticate'] = %(Basic realm="Concerto Configuration")
+            throw(:halt, [401, "Not authorized\n"])
+        end
+    end
+
+    def authorized?
+        @auth ||= Rack::Auth::Basic::Request.new(request.env)
+        @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['root', PASSWORD]
+    end
 end
 
-get '/' do
+get '/netconfig' do
+    protected!
     # parse config file
     begin
         cm, am = File.open(CONFIG_FILE) { |f| read_config(f) }
@@ -59,7 +81,8 @@ def do_assign(params, instance)
     end
 end
 
-post '/' do
+post '/netconfig' do
+    protected!
     cmclass = pick_class(params[:connection_type], CONNECTION_METHODS)
     fail "Connection method not supported" if cmclass.nil?
     
@@ -89,5 +112,5 @@ post '/' do
         f.write json_data.to_json
     end
 
-    redirect '/'
+    redirect '/netconfig' # as a get request
 end
