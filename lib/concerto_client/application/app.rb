@@ -7,10 +7,6 @@ require 'ipaddress'
 require 'concerto_client/netconfig'
 
 class ConcertoConfigServer < Sinatra::Base
-	# Some files we will use. None of these need to exist right away.
-	PASSWORD_FILE='/tmp/concerto_password'
-	URL_FILE='/tmp/concerto_url'
-
 	# push these over to netconfig.rb?
 	# Our list of available physical-layer connection methods...
 	CONNECTION_METHODS = [ 
@@ -29,15 +25,6 @@ class ConcertoConfigServer < Sinatra::Base
 		IPAddress.parse("::1") 
 	]
 
-	# Load our (constant) password from file.
-	begin
-		PASSWORD = File.open(PASSWORD_FILE) do |f|
-			f.readline.chomp
-		end
-	rescue Errno::ENOENT
-		PASSWORD = 'default'
-	end
-
 	helpers do
 		# Get the return value of the method on obj if obj supports the method.
 		# Otherwise return the empty string.
@@ -51,40 +38,39 @@ class ConcertoConfigServer < Sinatra::Base
 		end
 
 		# Enforce authentication on actions.
-		# Calling from within an action will check authentication and return 401
-		# if unauthorized.
+		# Calling from within an action will check authentication and return 
+		# 401 if unauthorized.
 		def protected!
 			unless authorized?
-				response['WWW-Authenticate'] = %(Basic realm="Concerto Configuration")
+				response['WWW-Authenticate'] = \
+					%(Basic realm="Concerto Configuration")
 				throw(:halt, [401, "Not authorized\n"])
 			end
 		end
 
 		# Check authorization credentials.
-		# Currently configured to check if the REMOTE_ADDR is localhost and allow
+		# Currently configured to check if the REMOTE_ADDR is local and allow
 		# everything if so. This permits someone at local console to configure
-		# without the need for a password. Others must have the correct password
-		# to be considered authorized.
+		# without the need for a password. Others must have the correct 
+		# password to be considered authorized.
 		def authorized?
 			ip = IPAddress.parse(request.env['REMOTE_ADDR'])
+			password = ConcertoConfig::ConfigStore.read_config(
+				'password', 'default'
+			)
 			if LOCALHOSTS.include? ip
 				# allow all requests from localhost no questions asked
 				true
 			else
 				@auth ||= Rack::Auth::Basic::Request.new(request.env)
-				@auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['root', PASSWORD]
+				@auth.provided? && @auth.basic? && @auth.credentials && \
+					@auth.credentials == ['root', password]
 			end
 		end
 
 		# Get our base URL from wherever it may be stored.
 		def concerto_url
-			begin
-				File.open(URL_FILE) do |f|
-					f.readline.chomp
-				end
-			rescue
-				""
-			end
+			ConcertoConfig::ConfigStore.read_config('concerto_url', '')
 		end
 
 		# Try to figure out what our current IPv4 address is
@@ -116,7 +102,8 @@ class ConcertoConfigServer < Sinatra::Base
 		# Check if we can retrieve a URL and get a 200 status code.
 		def validate_url(url)
 			begin
-				# this will fail with Errno::something if server can't be reached
+				# this will fail with Errno::something if server 
+				# can't be reached
 				response = Net::HTTP.get_response(URI(url))
 				if response.code != "200"
 					# also bomb out if we don't get an OK response
@@ -173,10 +160,9 @@ class ConcertoConfigServer < Sinatra::Base
 		protected!
 		url = params[:url]
 		if validate_url(url)
-			File.open(URL_FILE, 'w') do |f|
-				f.write url
-			end
-			
+			# save to the configuration store
+			ConcertoConfig::ConfigStore.write_config('concerto_url', url)
+
 			# root will now redirect to the proper concerto_url
 			redirect '/screen'
 		else
