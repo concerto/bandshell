@@ -25,6 +25,8 @@ class ConcertoConfigServer < Sinatra::Base
 		IPAddress.parse("::1") 
 	]
 
+	set :haml, { :format => :html5, :layout => :main }
+
 	helpers do
 		# Get the return value of the method on obj if obj supports the method.
 		# Otherwise return the empty string.
@@ -146,7 +148,7 @@ class ConcertoConfigServer < Sinatra::Base
 		if network_ok
 			# Everything's up and running, we just don't know what 
 			# our URL should be.
-			haml :setup, :layout => :main
+			haml :setup
 		else
 			# The network settings are not sane, we don't have an IP.
 			# Redirect the user to the network configuration page to 
@@ -175,7 +177,7 @@ class ConcertoConfigServer < Sinatra::Base
 	# render a page indicating that the concerto_url is no good.
 	# this page redirects to / every 5 seconds
 	get '/problem' do
-		haml :problem, :layout => :main
+		haml :problem
 	end
 
 	get '/netconfig' do
@@ -198,8 +200,7 @@ class ConcertoConfigServer < Sinatra::Base
 		haml :netsettings, :locals => { 
 				:connection_method => cm, 
 				:addressing_method => am 
-			},
-			:format => :html5, :layout => :main
+			}
 	end
 
 	# Given the name of a class, pick a class out of a list of allowed classes.
@@ -277,6 +278,23 @@ class ConcertoConfigServer < Sinatra::Base
 
 		# Back to the network form.
 		redirect '/netconfig' # as a get request
+	end
+
+	get '/password' do
+		protected!
+		haml :password
+	end
+
+	post '/password' do
+		protected!
+		
+		if params[:newpass] != params[:newpass_confirm]
+			# something something error handling something
+			redirect '/password'
+		end
+		
+		ConcertoConfig::ConfigStore.write_config('password', params[:newpass])
+		redirect '/setup'
 	end
 end
 
