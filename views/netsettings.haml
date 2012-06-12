@@ -3,6 +3,9 @@
 %form{:method=>"post"}
     %h2="Connection Type"
     %select#connection_type{:name=>"connection_type"}
+        / list out our available connection methods as options
+        / set the html selected flag on the one that is currently 
+        / selected in the config
         - CONNECTION_METHODS.each do |cm|
             %option{:value=>cm.name,
                 :selected=>(cm==connection_method.class)}=cm.description
@@ -13,6 +16,8 @@
                 %label{:for=>"WiredConnection_interface_name"}="Interface Name"
                 %select#interface_name{:name=>"WiredConnection/interface_name"}
                     %option{:value=>""}="Auto Select"
+                    / list out available interfaces and their MAC addresses
+                    / preselect one if there was one chosen in config
                     - WiredConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name)==iface.name}="#{iface.name} - #{iface.mac}"
         #WirelessConnection
@@ -21,6 +26,7 @@
                 %label{:for=>"WirelessConnection_interface_name"}="Interface Name"
                 %select#interface_name{:name=>"WirelessConnection/interface_name"}
                     %option{:value=>""}="Auto Select"
+                    / same as above but with the wireless interfaces
                     - WirelessConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name) == iface.name}="#{iface.name} - #{iface.mac}"
             %p
@@ -49,7 +55,7 @@
                 %input{:type=>"text", :name=>"StaticAddressing/gateway", 
                     :value=>value_from(addressing_method, :gateway)}
             %p
-                %label{:for=>"StaticAddressing_address"}="Nameservers"
+                %label{:for=>"StaticAddressing_address"}="Nameservers (separate with commas or spaces)"
                 %input{:type=>"text", :name=>"StaticAddressing/nameservers_flat", 
                     :value=>value_from(addressing_method, :nameservers_flat)}
 
