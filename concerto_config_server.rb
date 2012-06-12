@@ -7,15 +7,20 @@ require 'net/http'
 require 'ipaddress'
 
 # Some files we will use. None of these need to exist right away.
-NETCONFIG_FILE='/tmp/netconfig.json'
 PASSWORD_FILE='/tmp/concerto_password'
 URL_FILE='/tmp/concerto_url'
 
 # push these over to netconfig.rb?
 # Our list of available physical-layer connection methods...
-CONNECTION_METHODS = [ WiredConnection, WirelessConnection ]
+CONNECTION_METHODS = [ 
+    ConcertoConfig::WiredConnection, 
+    ConcertoConfig::WirelessConnection 
+]
 # ... and available layer-3 addressing methods.
-ADDRESSING_METHODS = [ DHCPAddressing, StaticAddressing ]
+ADDRESSING_METHODS = [ 
+    ConcertoConfig::DHCPAddressing, 
+    ConcertoConfig::StaticAddressing 
+]
 
 # Hosts we allow to access configuration without authenticating.
 LOCALHOSTS = [ 
@@ -195,9 +200,7 @@ get '/netconfig' do
     # is not implemented. This is also how we get away with just having
     # one instance each of the config classes that are currently selected.
     begin
-        cm, am = File.open(NETCONFIG_FILE) { 
-            |f| ConcertoConfig.read_config(f) 
-        }
+        cm, am = ConcertoConfig.read_config
     rescue Errno::ENOENT
         cm = nil
         am = nil
@@ -215,7 +218,7 @@ end
 # Given the name of a class, pick a class out of a list of allowed classes.
 # This is used for parsing the form input for network configuration.
 def pick_class(name, list)
-    list.find { |klass| klass.name == name }
+    list.find { |klass| klass.basename == name }
 end
 
 # Extract arguments from a set of form data that are intended to go to a
@@ -265,8 +268,8 @@ post '/netconfig' do
     
     # Now given the names of the specific classes the user has chosen,
     # extract the corresponding form fields.
-    cmargs = extract_class_args(params, cmclass.name)
-    amargs = extract_class_args(params, amclass.name)
+    cmargs = extract_class_args(params, cmclass.basename)
+    amargs = extract_class_args(params, amclass.basename)
 
     # Set properties on each instance given the form values passed in.
     do_assign(cmargs, cm)
@@ -279,22 +282,25 @@ post '/netconfig' do
 
     # Serialize our instances as JSON data to be written to the config file.
     json_data = {
-        'connection_method' => cmclass.name,
+        'connection_method' => cmclass.basename,
         'connection_method_args' => cm.args,
-        'addressing_method' => amclass.name,
+        'addressing_method' => amclass.basename,
         'addressing_method_args' => am.args
     }
 
     # Write the config file to disk.
-    File.open(NETCONFIG_FILE, 'w') do |f|
+    File.open(ConcertoConfig::CONFIG_FILE, 'w') do |f|
         f.write json_data.to_json
     end
 
     # Reload network configuration.
+    STDERR.puts "Trying to bring down the interface"
     if ConcertoConfig.configured_interface
         ConcertoConfig.configured_interface.ifdown
     end
-    configure_system
+    STDERR.puts "Rewriting configuration files"
+    ConcertoConfig::configure_system
+    STDERR.puts "Bringing interface back up"
     ConcertoConfig.configured_interface.ifup
 
     # Back to the network form.

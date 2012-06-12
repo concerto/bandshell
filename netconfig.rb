@@ -18,12 +18,21 @@ require 'ipaddress'
 # Each instance also has the opportunity to write out other configuration
 # files such as wpa_supplicant.conf, resolv.conf etc.
 
+class Module
+    def basename
+        name.gsub(/^.*::/, '')
+    end
+end
+
 module ConcertoConfig
     # Where we store the name of the interface we are going to configure.
     INTERFACE_FILE='/tmp/concerto_configured_interface'
 
     # The Debian interfaces configuration file we are going to write out.
     INTERFACES_FILE='/etc/network/interfaces'
+
+    # The configuration file we will read from.
+    CONFIG_FILE='/tmp/netconfig.json'
 
     # Some useful interface operations.
     class Interface
@@ -432,12 +441,12 @@ module ConcertoConfig
     # and returns the instances
     # i.e.
     # cm, am = read_config(STDIN)
-    def read_config(input)
-        input = input.read
+    def self.read_config
+        input = IO.read(CONFIG_FILE)
         args = JSON.parse(input)
 
-        connection_method_class = Object.const_get(args['connection_method'])
-        addressing_method_class = Object.const_get(args['addressing_method'])
+        connection_method_class = ConcertoConfig.const_get(args['connection_method'])
+        addressing_method_class = ConcertoConfig.const_get(args['addressing_method'])
 
         connection_method = connection_method_class.new(
             args['connection_method_args']
@@ -453,8 +462,8 @@ module ConcertoConfig
     # This reads a JSON configuration file on STDIN and writes the interfaces
     # file. Also the classes instantiated will have a chance to write
     # out any auxiliary files needed.
-    def configure_system
-        connection_method, addressing_method = read_config(STDIN)
+    def self.configure_system
+        connection_method, addressing_method = read_config
 
         ifname = connection_method.config_interface_name
 
@@ -486,7 +495,7 @@ module ConcertoConfig
     end
 
     # Get the name of the interface we configured
-    def configured_interface
+    def self.configured_interface
         begin
             ifname = File.open(INTERFACE_FILE) do |f|
                 f.readline.chomp

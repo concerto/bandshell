@@ -7,7 +7,7 @@
         / set the html selected flag on the one that is currently 
         / selected in the config
         - CONNECTION_METHODS.each do |cm|
-            %option{:value=>cm.name,
+            %option{:value=>cm.basename,
                 :selected=>(cm==connection_method.class)}=cm.description
     #connection
         #WiredConnection
@@ -18,7 +18,7 @@
                     %option{:value=>""}="Auto Select"
                     / list out available interfaces and their MAC addresses
                     / preselect one if there was one chosen in config
-                    - WiredConnection.interfaces.each do |iface|
+                    - ConcertoConfig::WiredConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name)==iface.name}="#{iface.name} - #{iface.mac}"
         #WirelessConnection
             %h3="Wireless Connection Settings (no encryption)"
@@ -27,7 +27,7 @@
                 %select#interface_name{:name=>"WirelessConnection/interface_name"}
                     %option{:value=>""}="Auto Select"
                     / same as above but with the wireless interfaces
-                    - WirelessConnection.interfaces.each do |iface|
+                    - ConcertoConfig::WirelessConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name) == iface.name}="#{iface.name} - #{iface.mac}"
             %p
                 %label{:for=>"WirelessConnection_ssid"}="SSID"
@@ -36,7 +36,7 @@
     %h2="IP Address"
     %select#addressing_type{:name=>"addressing_type"}
         - ADDRESSING_METHODS.each do |am|
-            %option{:value=>am.name,
+            %option{:value=>am.basename,
                 :selected=>(am==addressing_method.class)}=am.description
     #address
         #DHCPAddressing
