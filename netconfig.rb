@@ -4,19 +4,36 @@ require 'rubygems'
 require 'json'
 require 'ipaddress'
 
+# Where we squirrel away the name of the interface we are going to configure.
 INTERFACE_FILE='/tmp/concerto_configured_interface'
 
+# The big idea here is that we have connection methods (layer 2)
+# and addressing methods (layer 3) and by combining that configuration
+# information we end up with a complete network configuration.
+#
+# Each general layer-2 and layer-3 connection method is represented
+# as a class; adding the specific details creates an instance of the class.
+# The configuration is serialized as the name of the class plus the details
+# needed to reconstruct the instance.
+#
+# Each instance can contribute lines to /etc/network/interfaces,
+# the Debian standard network configuration file.
+# Each instance also has the opportunity to write out other configuration
+# files such as wpa_supplicant.conf, resolv.conf etc.
+
+# Some useful interface operations.
 class Interface
+    # Wrap an interface name (eth0, wlan0 etc) with some useful operations.
     def initialize(name)
         @name = name
     end
 
-    def name
-        @name
-    end
+    # Get the name of the interface as a string.
+    attr_reader :name
 
+    # Get the (first) IPv4 address assigned to the interface.
+    # Return "0.0.0.0" if we don't have any v4 addresses.
     def ip
-        ifconfig = `/sbin/ifconfig #{@name}`
         if ifconfig =~ /inet addr:([0-9.]+)/
             $1
         else
@@ -24,13 +41,103 @@ class Interface
         end
     end
 
+    # Get the physical (mac, ethernet) address of the interface.
     def mac
-        File.open("/sys/class/net/#{name}/address") do |f|
+        File.open("/sys/class/net/#{@name}/address") do |f|
             f.read.chomp
         end
     end
+
+    def up
+        system("/sbin/ifconfig #{@name} up")
+    end
+
+    def down
+        system("/sbin/ifconfig #{@name} down")
+    end
+
+    def up?
+        if ifconfig =~ /UP/
+            true
+        else
+            false
+        end
+    end
+
+    def medium_present?
+        brought_up = false
+        result = false
+
+        if not up?
+            brought_up = true
+            up
+            sleep 10
+        end
+
+        if ifconfig =~ /RUNNING/
+            result = true
+        end
+        
+        if brought_up
+            down
+        end
+
+        result
+    end
+private
+    def ifconfig
+        `/sbin/ifconfig #{@name}`
+    end
 end
 
+# (Instance) methods that must be defined by all connection and 
+# addressing method classes
+# 
+# creation and serialization:
+#
+# initialize(args={}): Create a new instance. When unserializing the args hash
+# created during serialization is passed in.
+#
+# args: return a hash of data needed to reconstruct the instance. This hash
+# will be passed to initialize() when unserializing.
+#
+# OS-level configuration:
+#
+# write_configs: Write out any additional configuration files needed 
+# (e.g. resolv.conf, wpa_supplicant.conf, ...)
+#
+# config_interface_name (only for connection methods): return the name of the
+# physical interface to be used for the connection
+#
+# addressing_type (only for addressing methods): return the name of the 
+# addressing method (dhcp, static, manual...) to be used in the Debian
+# network configuration file /etc/network/interfaces.
+#
+# interfaces_lines: an array of strings representing lines to be added
+# to the /etc/network/interfaces file after the line naming the interface.
+#
+# Stuff for the Web interface:
+#
+# safe_assign: return an array of symbols representing fields the user should
+# be allowed to modify.
+#
+# validate: check that the internal configuration is at least somewhat 
+# consistent and stands a chance of working; throw exception if not
+# (FIXME! need a better error handling mechanism)
+# 
+# and attr_accessors for everything the web interface 
+# should be able to assign to.
+#
+# Everyone must define a class method self.description as well.
+# This returns a string that is displayed in the web interface dropdowns
+# because using plain class identifiers there doesn't look good.
+# This should be something short like "Wired Connection".
+
+# Layer 2 connection via wired media.
+# We will look for wired interfaces that have media connected,
+# or use an interface chosen by the user via the args. There's
+# nothing extra to be contributed to the interfaces file besides
+# the name of the interface to be used.
 class WiredConnection
     def initialize(args={})
         if args['interface_name']
@@ -38,14 +145,12 @@ class WiredConnection
         end
     end
 
-    # Write any necessary auxiliary configuration files
     def write_configs
         # We don't need any.
     end
 
-    # Return the name of the interface to be configured.
     def config_interface_name
-        if @interface_name
+        if @interface_name && @interface_name.length > 0
             # the user has specified an interface to use
             @interface_name
         else
@@ -54,9 +159,10 @@ class WiredConnection
         end
     end
 
+    # If interface_name is something other than nil or the empty string,
+    # we will override the automatic media detection and use that interface.
     attr_accessor :interface_name
 
-    # list of methods allowed to be called by name through the web interface
     def safe_assign
         [ :interface_name ]
     end
@@ -67,10 +173,7 @@ class WiredConnection
         }
     end
     
-    # Return any additional lines needed in the interfaces file
-    # e.g. referencing WPA config files...
     def interfaces_lines
-        # Nothing special needed for wired connections.
         []
     end
 
@@ -82,6 +185,7 @@ class WiredConnection
         end  
     end
 
+    # Try to find all wired interfaces on the system.
     def self.interfaces
         # This is somewhat Linux specific, and may not be all encompassing.
         devices = Dir.glob('/sys/class/net/eth*')
@@ -93,41 +197,27 @@ class WiredConnection
     end
 
 private
-    def interface_connected(iface)
-        results = `/sbin/mii-tool #{iface.name}`
-        if results =~ /link ok/
-            true
-        else
-            false
-        end
-    end
-
-    def up(iface)
-        system("ifconfig #{iface.name} up")
-    end
-
-    def down(iface)
-        system("ifconfig #{iface.name} down")
-    end
-
+    # Find the first wired interface with medium present. If none
+    # is found default to eth0.
     def scan_interfaces
-        self.class.interfaces.each do |iface|
-            up(iface)
-            sleep 10
-            if interface_connected(iface)
-                down(iface)
-                return iface.name
-            end
-            down(iface)
-        end
+        first_with_medium = self.class.interfaces.find { 
+            |iface| iface.medium_present? 
+        }
 
-        # if we get here no interface was found with a cable attached
-        # default to eth0 and hope for the best
-        STDERR.puts "warning: no suitable interface found, defaulting to eth0"
-        'eth0'
+        if first_with_medium
+            first_with_medium
+        else
+            # if we get here no interface was found with a cable attached
+            # default to eth0 and hope for the best
+            STDERR.puts "warning: no suitable interface found, defaulting to eth0"
+            'eth0'
+        end
     end
 end
 
+# 802.11* unencrypted wireless connections.
+# These are managed by wpa_supplicant on Debian so we need to create its
+# configuration file and link it to the interfaces file.
 class WirelessConnection
     def initialize(args={})
         @ssid = args['ssid'] || ''
@@ -169,6 +259,7 @@ class WirelessConnection
     end
 
     def interfaces_lines
+        # This links the wpa config to the interfaces file.
         ["wpa-conf #{@wpa_config_file}"]
     end
 
@@ -184,12 +275,16 @@ class WirelessConnection
     end
 
     def self.interfaces
-        # This is somewhat Linux specific, and may not be all encompassing.
+        # Again this is not guaranteed to be a catch all.
         devices = Dir.glob('/sys/class/net/{ath,wlan}*')
         devices.map { |d| Interface.new(File.basename(d)) }
     end
 end
 
+# Static IPv4 addressing.
+# We use the IPAddress gem to validate that the address information
+# is vaguely correct (weeding out errors like the gateway 
+# being on another subnet)
 class StaticAddressing
     def initialize(args={})
         @nameservers = args['nameservers']
@@ -260,6 +355,9 @@ class StaticAddressing
         end
     end
 
+    # These next two methods are for the web interface, where it's
+    # more convenient to enter a bunch of nameservers on one line
+    # than to have to deal with an array of fields.
     def nameservers_flat=(separated_list)
         servers = separated_list.strip.split(/\s*[,|:;\s]\s*/)
         servers.each do |server|
@@ -277,6 +375,7 @@ class StaticAddressing
     end
 end
 
+# Dynamic IPv4 addressing via DHCP
 class DHCPAddressing
     def initialize(args={})
         # we accept no args
@@ -292,7 +391,7 @@ class DHCPAddressing
     end
 
     def validate
-
+        # nothing to validate
     end
 
     def safe_assign
@@ -312,6 +411,11 @@ class DHCPAddressing
     end
 end
 
+# Read a JSON formatted network configuration from an input stream.
+# This instantiates the connection and addressing method classes
+# and returns the instances
+# i.e.
+# cm, am = read_config(STDIN)
 def read_config(input)
     input = input.read
     args = JSON.parse(input)
@@ -330,11 +434,16 @@ def read_config(input)
     return [connection_method, addressing_method]    
 end
 
+# This reads a JSON configuration file on STDIN and writes the interfaces
+# file on STDOUT. Also the classes instantiated will have a chance to write
+# out any auxiliary files needed.
 def configure_system
     connection_method, addressing_method = read_config(STDIN)
 
     ifname = connection_method.config_interface_name
 
+    # squirrel away the name of the interface we are configuring
+    # This will be useful later for getting network status information.
     File.open(INTERFACE_FILE, 'w') do |f|
         f.write ifname
     end
