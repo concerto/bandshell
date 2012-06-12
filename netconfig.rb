@@ -32,7 +32,7 @@ module ConcertoConfig
     INTERFACES_FILE='/etc/network/interfaces'
 
     # The configuration file we will read from.
-    CONFIG_FILE='/tmp/netconfig.json'
+    CONFIG_FILE='/live/image/netconfig.json'
 
     # Some useful interface operations.
     class Interface
@@ -446,8 +446,18 @@ module ConcertoConfig
     # i.e.
     # cm, am = read_config(STDIN)
     def self.read_config
-        input = IO.read(CONFIG_FILE)
-        args = JSON.parse(input)
+		begin
+			input = IO.read(CONFIG_FILE)
+			args = JSON.parse(input)
+		rescue Errno::ENOENT
+			# set up some sane defaults if the config file doesn't exist
+			args = {
+				'connection_method' => 'WiredConnection',
+				'addressing_method' => 'DHCPAddressing',
+				'connection_method_args' => { },
+				'addressing_method_args' => { }
+			}
+		end
 
         connection_method_class = ConcertoConfig.const_get(args['connection_method'])
         addressing_method_class = ConcertoConfig.const_get(args['addressing_method'])
