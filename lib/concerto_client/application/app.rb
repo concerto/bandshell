@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'sinatra'
+require 'sinatra/base'
 require 'haml'
 require 'json'
 require 'net/http'
@@ -201,7 +201,7 @@ class ConcertoConfigServer < Sinatra::Base
 		# is not implemented. This is also how we get away with just having
 		# one instance each of the config classes that are currently selected.
 		begin
-			cm, am = ConcertoConfig.read_config
+			cm, am = ConcertoConfig.read_network_config
 		rescue Errno::ENOENT
 			cm = nil
 			am = nil
@@ -276,23 +276,8 @@ class ConcertoConfigServer < Sinatra::Base
 		do_assign(cmargs, cm)
 		do_assign(amargs, am)
 
-		# Check that everything is consistent. If not, we currently throw
-		# an exception, which probably is not the best long term solution.
-		cm.validate
-		am.validate
-
-		# Serialize our instances as JSON data to be written to the config file.
-		json_data = {
-			'connection_method' => cmclass.basename,
-			'connection_method_args' => cm.args,
-			'addressing_method' => amclass.basename,
-			'addressing_method_args' => am.args
-		}
-
-		# Write the config file to disk.
-		File.open(ConcertoConfig::CONFIG_FILE, 'w') do |f|
-			f.write json_data.to_json
-		end
+		# Save the configuration file.
+		ConcertoConfig.write_network_config(cm, am)
 
 		# Reload network configuration.
 		STDERR.puts "Trying to bring down the interface"
@@ -300,7 +285,7 @@ class ConcertoConfigServer < Sinatra::Base
 			ConcertoConfig.configured_interface.ifdown
 		end
 		STDERR.puts "Rewriting configuration files"
-		ConcertoConfig::configure_system
+		ConcertoConfig::configure_system_network
 		STDERR.puts "Bringing interface back up"
 		ConcertoConfig.configured_interface.ifup
 

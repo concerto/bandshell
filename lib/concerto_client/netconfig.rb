@@ -3,6 +3,7 @@
 require 'rubygems'
 require 'json'
 require 'ipaddress'
+require 'concerto_client/config_store'
 
 # The big idea here is that we have connection methods (layer 2)
 # and addressing methods (layer 3) and by combining that configuration
@@ -19,20 +20,16 @@ require 'ipaddress'
 # files such as wpa_supplicant.conf, resolv.conf etc.
 
 class Module
+	# Get the name of a class/module and strip off any leading modules.
+	# This is useful in determining arguments for Module#const_get.
     def basename
         name.gsub(/^.*::/, '')
     end
 end
 
 module ConcertoConfig
-    # Where we store the name of the interface we are going to configure.
-    INTERFACE_FILE='/tmp/concerto_configured_interface'
-
     # The Debian interfaces configuration file we are going to write out.
     INTERFACES_FILE='/etc/network/interfaces'
-
-    # The configuration file we will read from.
-    CONFIG_FILE='/live/image/netconfig.json'
 
     # Some useful interface operations.
     class Interface
@@ -440,17 +437,20 @@ module ConcertoConfig
         end
     end
 
-    # Read a JSON formatted network configuration from an input stream.
+    # Read a JSON formatted network configuration from the config store.
     # This instantiates the connection and addressing method classes
-    # and returns the instances
-    # i.e.
-    # cm, am = read_config(STDIN)
-    def self.read_config
+    # and returns the instances i.e. cm, am = read_network_config
+	# 
+	# If no configuration is saved or it is corrupt this returns
+	# a default configuration that is somewhat likely to work.
+    def self.read_network_config
+		input = ConfigStore.read_config('network_config', '')
+
 		begin
-			input = IO.read(CONFIG_FILE)
 			args = JSON.parse(input)
-		rescue Errno::ENOENT
-			# set up some sane defaults if the config file doesn't exist
+		rescue
+			# set up some sane defaults if we have no configuration
+			# or it can't be parsed
 			args = {
 				'connection_method' => 'WiredConnection',
 				'addressing_method' => 'DHCPAddressing',
@@ -473,19 +473,38 @@ module ConcertoConfig
         return [connection_method, addressing_method]    
     end
 
+	# Save the network configuration to the configuration store.
+	# Arguments are instances of connection method and addressing 
+	# method classes. Throws exception if either one is not valid.
+	def self.write_network_config(cm, am)
+		# Check that everything is consistent. If not, we currently throw
+		# an exception, which probably is not the best long term solution.
+		cm.validate
+		am.validate
+
+		# Serialize our instances as JSON data to be written to the config file.
+		json_data = {
+			'connection_method' => cm.class.basename,
+			'connection_method_args' => cm.args,
+			'addressing_method' => am.class.basename,
+			'addressing_method_args' => am.args
+		}.to_json
+		
+		# Save the serialized configuration.
+		ConfigStore.write_config('network_config', json_data)
+	end
+
     # This reads a JSON configuration file on STDIN and writes the interfaces
     # file. Also the classes instantiated will have a chance to write
     # out any auxiliary files needed.
-    def self.configure_system
-        connection_method, addressing_method = read_config
+    def self.configure_system_network
+        connection_method, addressing_method = read_network_config
 
         ifname = connection_method.config_interface_name
 
         # squirrel away the name of the interface we are configuring
         # This will be useful later for getting network status information.
-        File.open(INTERFACE_FILE, 'w') do |f|
-            f.write ifname
-        end
+		ConfigStore.write_config('network_interface', ifname)
         
         # Write the /etc/network/interfaces file.
         File.open(INTERFACES_FILE, 'w') do |f|
@@ -510,13 +529,11 @@ module ConcertoConfig
 
     # Get the name of the interface we configured
     def self.configured_interface
-        begin
-            ifname = File.open(INTERFACE_FILE) do |f|
-                f.readline.chomp
-            end
-            Interface.new(ifname)
-        rescue
-            nil
-        end
+		ifname = ConfigStore.read_config('network_interface', '')
+		if ifname != ''
+			Interface.new(ifname)
+		else
+			nil
+		end
     end
 end
