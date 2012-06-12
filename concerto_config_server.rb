@@ -6,18 +6,23 @@ require './netconfig'
 require 'net/http'
 require 'ipaddress'
 
+# Some files we will use. None of these need to exist right away.
 NETCONFIG_FILE='/tmp/netconfig.json'
 PASSWORD_FILE='/tmp/concerto_password'
 URL_FILE='/tmp/concerto_url'
 
+# Our list of available physical-layer connection methods...
 CONNECTION_METHODS = [ WiredConnection, WirelessConnection ]
+# ... and available layer-3 addressing methods.
 ADDRESSING_METHODS = [ DHCPAddressing, StaticAddressing ]
 
+# Hosts we allow to access configuration without authenticating.
 LOCALHOSTS = [ 
     IPAddress.parse("127.0.0.1"), 
     IPAddress.parse("::1") 
 ]
 
+# Load our (constant) password from file.
 begin
     PASSWORD = File.open(PASSWORD_FILE) do |f|
         f.readline.chomp
@@ -27,6 +32,9 @@ rescue Errno::ENOENT
 end
 
 helpers do
+    # Get the return value of the method on obj if obj supports the method.
+    # Otherwise return the empty string.
+    # This is useful in views where arguments may be of diverse types.
     def value_from(obj, method)
         if obj.respond_to? method
             obj.send method
@@ -35,6 +43,9 @@ helpers do
         end
     end
 
+    # Enforce authentication on actions.
+    # Calling from within an action will check authentication and return 401
+    # if unauthorized.
     def protected!
         unless authorized?
             response['WWW-Authenticate'] = %(Basic realm="Concerto Configuration")
@@ -42,6 +53,11 @@ helpers do
         end
     end
 
+    # Check authorization credentials.
+    # Currently configured to check if the REMOTE_ADDR is localhost and allow
+    # everything if so. This permits someone at local console to configure
+    # without the need for a password. Others must have the correct password
+    # to be considered authorized.
     def authorized?
         ip = IPAddress.parse(request.env['REMOTE_ADDR'])
         if LOCALHOSTS.include? ip
@@ -53,6 +69,7 @@ helpers do
         end
     end
 
+    # Get our base URL from wherever it may be stored.
     def concerto_url
         begin
             File.open(URL_FILE) do |f|
@@ -63,6 +80,8 @@ helpers do
         end
     end
 
+    # Try to figure out what our current IPv4 address is
+    # and return it as a string.
     def my_ip
         iface = configured_interface
         if iface
@@ -72,20 +91,28 @@ helpers do
         end
     end
 
+    # Check if we have something resembling a network connection.
+    # This means we found a usable interface and it has an IPv4 address.
     def network_ok
         if configured_interface
-            true
+            if configured_interface.ip != "0.0.0.0"
+                true
+            else
+                false
+            end
         else
             false
         end
     end
 
-    def validate_url
+    # Check if we can retrieve a URL and get a 200 status code.
+    def validate_url(url)
         begin
             # this will fail with Errno::something if server can't be reached
-            response = Net::HTTP.get_response(URI(concerto_url))
+            response = Net::HTTP.get_response(URI(url))
             if response.code != "200"
                 # also bomb out if we don't get an OK response
+                # maybe demanding 200 is too strict here?
                 fail
             end
 
@@ -98,7 +125,11 @@ helpers do
     end
 end
 
-get '/' do
+# The local fullscreen browser will go to /screen.
+# We should redirect to the screen URL if possible.
+# Otherwise, we need to go to the setup page to show useful information
+# and allow for local configuration if needed/wanted.
+get '/screen' do
     # if we don't have a URL go to setup
     # if we do, check it out
     if concerto_url == ''
@@ -114,6 +145,7 @@ get '/' do
     end
 end
 
+# Present a form for entering the base URL.
 get '/setup' do
     protected!
     if network_ok
@@ -128,6 +160,7 @@ get '/setup' do
     end
 end
 
+# Save the Concerto base URL.
 post '/setup' do
     protected!
     url = params[:url]
@@ -140,6 +173,7 @@ post '/setup' do
         redirect '/'
     else
         # the URL was no good, back to setup!
+        # error handling flash something something something
         redirect '/setup'
     end
 end
@@ -154,6 +188,10 @@ get '/netconfig' do
     protected!
 
     # parse existing config file (if any)
+    # if there isn't one, nil will suffice because our
+    # value_from(...) helper will return the empty string if a method
+    # is not implemented. This is also how we get away with just having
+    # one instance each of the config classes that are currently selected.
     begin
         cm, am = File.open(NETCONFIG_FILE) { |f| read_config(f) }
     rescue Errno::ENOENT
@@ -162,7 +200,7 @@ get '/netconfig' do
     end
 
     # view will grab what it can from our existing 
-    # connection/addressing methods
+    # connection/addressing methods using value_from().
     haml :netsettings, :locals => { 
             :connection_method => cm, 
             :addressing_method => am 
@@ -206,6 +244,7 @@ def do_assign(params, instance)
     end
 end
 
+# Process the form fields and generate a JSON network configuration file.
 post '/netconfig' do
     protected!
 
