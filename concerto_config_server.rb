@@ -11,6 +11,7 @@ NETCONFIG_FILE='/tmp/netconfig.json'
 PASSWORD_FILE='/tmp/concerto_password'
 URL_FILE='/tmp/concerto_url'
 
+# push these over to netconfig.rb?
 # Our list of available physical-layer connection methods...
 CONNECTION_METHODS = [ WiredConnection, WirelessConnection ]
 # ... and available layer-3 addressing methods.
@@ -83,7 +84,7 @@ helpers do
     # Try to figure out what our current IPv4 address is
     # and return it as a string.
     def my_ip
-        iface = configured_interface
+        iface = ConcertoConfig.configured_interface
         if iface
             iface.ip
         else
@@ -94,8 +95,9 @@ helpers do
     # Check if we have something resembling a network connection.
     # This means we found a usable interface and it has an IPv4 address.
     def network_ok
-        if configured_interface
-            if configured_interface.ip != "0.0.0.0"
+        iface = ConcertoConfig.configured_interface
+        if iface
+            if iface.ip != "0.0.0.0"
                 true
             else
                 false
@@ -170,7 +172,7 @@ post '/setup' do
         end
         
         # root will now redirect to the proper concerto_url
-        redirect '/'
+        redirect '/screen'
     else
         # the URL was no good, back to setup!
         # error handling flash something something something
@@ -193,7 +195,9 @@ get '/netconfig' do
     # is not implemented. This is also how we get away with just having
     # one instance each of the config classes that are currently selected.
     begin
-        cm, am = File.open(NETCONFIG_FILE) { |f| read_config(f) }
+        cm, am = File.open(NETCONFIG_FILE) { 
+            |f| ConcertoConfig.read_config(f) 
+        }
     rescue Errno::ENOENT
         cm = nil
         am = nil
@@ -286,7 +290,12 @@ post '/netconfig' do
         f.write json_data.to_json
     end
 
-    # something something reload configs here something
+    # Reload network configuration.
+    if ConcertoConfig.configured_interface
+        ConcertoConfig.configured_interface.ifdown
+    end
+    configure_system
+    ConcertoConfig.configured_interface.ifup
 
     # Back to the network form.
     redirect '/netconfig' # as a get request

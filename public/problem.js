@@ -1,5 +1,5 @@
 function redirect() {
-    window.location = '/';
+    window.location = '/screen';
 }
 
 $(function() {

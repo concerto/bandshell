@@ -3,10 +3,11 @@
     You're seeing this because your Concerto player has not yet been configured.
     We need the URL of your Concerto instance before we can get up and running.
 
-%p
-    %label{:for=>'url'} URL
-    %input{:type=>'text', :name=>'url'}
-    %input{:type=>'submit', :value=>'Here it is!'}
+%form{:method=>'post'}
+    %p
+        %label{:for=>'url'} URL
+        %input{:type=>'text', :name=>'url'}
+        %input{:type=>'submit', :value=>'Here it is!'}
 
 %p
     The IPv4 address of this screen appears to be:
