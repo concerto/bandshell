@@ -228,7 +228,7 @@ module ConcertoConfig
             }
 
             if first_with_medium
-                first_with_medium
+                first_with_medium.name
             else
                 # if we get here no interface was found with a cable attached
                 # default to eth0 and hope for the best
@@ -255,7 +255,11 @@ module ConcertoConfig
             # Otherwise, just pick the first wlan interface, assuming
             # it works and all wlan interfaces have approximately equal
             # reception. When this assumption is wrong the user must force.
-            @interface_name || self.class.interfaces[0].name
+            if @interface_name && @interface_name != ''
+                @interface_name
+            else
+                self.class.interfaces[0].name
+            end
         end
 
         def validate
@@ -272,7 +276,7 @@ module ConcertoConfig
             # Write a wpa_supplicant.conf file for an unsecured network.
             File.open(@wpa_config_file, 'w') do |wpaconf|
                 # long lines, sorry!
-                wpaconf.puts "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel"
+                wpaconf.puts "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev"
                 wpaconf.puts "network={"
                 wpaconf.puts "ssid=\"#{@ssid}\""
                 wpaconf.puts "scan_ssid=1"

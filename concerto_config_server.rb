@@ -246,7 +246,7 @@ def do_assign(params, instance)
 
     params.each do |param, value|
         if safe.include? param.intern
-            instance.public_send((param + '=').intern, value)
+            instance.send((param + '=').intern, value)
         end
     end
 end
