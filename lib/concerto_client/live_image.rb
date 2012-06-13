@@ -15,7 +15,8 @@ module ConcertoConfig
 					f = Tempfile.new('test', self.mountpoint)
 					f.close!
 					false
-				rescue Errno::EROFS
+				rescue 
+					# if the tempfile creation bombs we assume readonly
 					true
 				end
 			end
