@@ -2,5 +2,5 @@
 
 require 'concerto_client/netconfig'
 
-ConcertoConfig::configure_system
+ConcertoConfig::configure_system_network
 
