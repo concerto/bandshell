@@ -2,8 +2,8 @@ require 'rake'
 
 Gem::Specification.new do |s|
 	s.name			= 'concerto_client'
-	s.version		= '0.0.5'
-	s.date			= '2012-06-12'
+	s.version		= '0.0.7'
+	s.date			= '2012-06-19'
 	s.summary		= 'Concerto Client Tools'
 	s.description	= 'Client-side tools for Concerto digital signage'
 	s.authors		= ['Andrew Armenia']
