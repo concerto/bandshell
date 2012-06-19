@@ -1,3 +1,5 @@
+require 'tempfile'
+
 # Functions for dealing with the live image
 # (where it's mounted, if it's read-only, etc)
 module ConcertoConfig
