@@ -1,4 +1,4 @@
-require 'concerto_client/live_image'
+require 'live_image'
 require 'fileutils'
 
 # A key/value store for strings.

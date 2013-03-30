@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 begin
-	require 'concerto_client/application/app.rb'
+	require 'web/app.rb'
 rescue LoadError => e
 	require 'rubygems'
-	path = File.expand_path '../../lib', __FILE__
+	path = File.expand_path '../lib', __FILE__
 	$:.unshift(path) if File.directory?(path) && !$:.include?(:path)
-	require 'concerto_client/application/app.rb'
+	require 'web/app.rb'
 end

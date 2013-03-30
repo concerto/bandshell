@@ -4,7 +4,7 @@ require 'haml'
 require 'json'
 require 'net/http'
 require 'ipaddress'
-require 'concerto_client/netconfig'
+require 'netconfig'
 
 class ConcertoConfigServer < Sinatra::Base
 	# push these over to netconfig.rb?

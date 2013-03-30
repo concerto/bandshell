@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'json'
 require 'ipaddress'
-require 'concerto_client/config_store'
+require 'config_store'
 
 # The big idea here is that we have connection methods (layer 2)
 # and addressing methods (layer 3) and by combining that configuration
