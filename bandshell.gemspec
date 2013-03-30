@@ -11,7 +11,8 @@ Gem::Specification.new do |s|
   s.add_dependency "sinatra"
   s.add_dependency "haml"	
   s.add_dependency "sys-uptime"	 
-  s.add_dependency "sys-proctable"	   
+  s.add_dependency "sys-proctable"
+  s.add_dependency "ipaddress"
 	s.files			= FileList[
 		'lib/*.rb', 'web/*', 'web/public/*', 'web/views/*', 'bin/*'
 	].to_a
