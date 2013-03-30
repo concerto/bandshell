@@ -1,0 +1,25 @@
+%h1 Welcome to Concerto Player
+%p 
+	You're seeing this because your Concerto player has not yet been configured.
+	We need the URL of your Concerto instance before we can get up and running.
+
+%form{:method=>'post'}
+	%p
+		%label{:for=>'url'} URL
+		%input{:type=>'text', :name=>'url'}
+		%input{:type=>'submit', :value=>'Here it is!'}
+
+%p
+	The IPv4 address of this screen appears to be:
+	=my_ip
+%p
+	==This page can be accessed remotely via http://#{my_ip}/setup
+%p
+	Username is root, default password is 'default'.
+%p 
+	Also, you may want to
+	%a{:href=>'/netconfig'} change network settings
+	or
+	%a{:href=>'/password'} change the configuration password.
+	
+	
