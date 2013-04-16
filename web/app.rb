@@ -5,6 +5,9 @@ require 'json'
 require 'net/http'
 require 'ipaddress'
 require 'netconfig'
+require 'sys/uptime'
+require 'sys/proctable'
+include Sys
 
 class ConcertoConfigServer < Sinatra::Base
 	# push these over to netconfig.rb?
@@ -120,6 +123,10 @@ class ConcertoConfigServer < Sinatra::Base
 				false
 			end
 		end
+	end
+
+	get '/' do
+	  'Welcome to Bandshell!'
 	end
 
 	# The local fullscreen browser will go to /screen.
@@ -296,6 +303,14 @@ class ConcertoConfigServer < Sinatra::Base
 		ConcertoConfig::ConfigStore.write_config('password', params[:newpass])
 		redirect '/setup'
 	end
+	
+	#Shows uptime,firmware version, and general system and process information
+	#Requires ffi, sys-uptime, and sys-proctable gems
+	get '/status' do
+	  @proctable = ProcTable.ps
+	  erb :player_status
+	end	
+	
 end
 
 ConcertoConfigServer.run!

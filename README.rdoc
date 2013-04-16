@@ -10,7 +10,11 @@ Bandshell has three main components:
 
 == Development Status
 
-This code is in the very early stages of development, so don't expect it to be particularly useful just yet.
+===Building Bandshell for development
+
+* Build the Bandshell gem with "gem build bandshell.gemspec"
+* Run "sudo gem install bandshell-xxx.gem"
+* Run "ruby web/app.rb" to launch the Sinatra application and go to http://127.0.0.1:4567
 
 == Documentation
 
