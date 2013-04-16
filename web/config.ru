@@ -1,3 +1,2 @@
-require '../lib/bandshell-lib.rb'
-require './bandshell-web.rb'
+require './app.rb'
 run Sinatra::Application
