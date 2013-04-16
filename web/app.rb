@@ -126,7 +126,11 @@ class ConcertoConfigServer < Sinatra::Base
 	end
 
 	get '/' do
-	  'Welcome to Bandshell!'
+	  if concerto_url == ''
+	    redirect '/setup'
+	  else
+	    redirect '/player_status'
+	  end
 	end
 
 	# The local fullscreen browser will go to /screen.
@@ -136,9 +140,9 @@ class ConcertoConfigServer < Sinatra::Base
 	get '/screen' do
 		# if we don't have a URL go to setup
 		# if we do, check it out
-		if concerto_url == ''
-			redirect '/setup'
-		else
+		#if concerto_url == ''
+			#redirect '/setup'
+		#else
 			# check if the concerto server is reachable, if so redirect there
 			# if not redirect to a local error message screen
 			if validate_url(concerto_url)
@@ -146,22 +150,22 @@ class ConcertoConfigServer < Sinatra::Base
 			else
 				redirect '/problem'
 			end
-		end
+		#end
 	end
 
 	# Present a form for entering the base URL.
 	get '/setup' do
 		protected!
-		if network_ok
+		#if network_ok
 			# Everything's up and running, we just don't know what 
 			# our URL should be.
 			haml :setup
-		else
+		#else
 			# The network settings are not sane, we don't have an IP.
 			# Redirect the user to the network configuration page to 
 			# take care of this.
-			redirect '/netconfig'
-		end
+			#redirect '/netconfig'
+		#end
 	end
 
 	# Save the Concerto base URL.
@@ -306,9 +310,9 @@ class ConcertoConfigServer < Sinatra::Base
 	
 	#Shows uptime,firmware version, and general system and process information
 	#Requires ffi, sys-uptime, and sys-proctable gems
-	get '/status' do
+	get '/player_status' do
 	  @proctable = ProcTable.ps
-	  erb :player_status
+	  haml :player_status
 	end	
 	
 end

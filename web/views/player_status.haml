@@ -1,0 +1,8 @@
+System Uptime: #{Uptime.uptime}
+
+System Processes:
+%br/
+- for p in @proctable
+  %b= p.comm
+  (PID #{p.pid.to_s})
+  %br/
