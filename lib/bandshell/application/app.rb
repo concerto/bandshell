@@ -10,6 +10,11 @@ require 'sys/proctable'
 include Sys
 
 class ConcertoConfigServer < Sinatra::Base
+	# set paths relative to this file's location
+	set :static, true
+	set :public, File.expand_path('..', __FILE__)
+	set :views, File.expand_path('../views', __FILE__)
+
 	# push these over to netconfig.rb?
 	# Our list of available physical-layer connection methods...
 	CONNECTION_METHODS = [ 
