@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+# control wrapper for ConcertoConfigServer sinatra app
+
+require "rubygems"
+require "daemons"
+require "bandshell/application/app"
+
+Daemons.run_proc("bandshelld", :dir_mode => :system) do
+	ConcertoConfigServer.run!
+end
