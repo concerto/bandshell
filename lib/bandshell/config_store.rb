@@ -1,9 +1,9 @@
-require 'live_image'
+require 'bandshell/live_image'
 require 'fileutils'
 
 # A key/value store for strings.
 # Right now implemented as disk files.
-module ConcertoConfig
+module Bandshell
 	module ConfigStore
 		@@path = nil
 

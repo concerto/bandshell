@@ -4,7 +4,7 @@ require 'haml'
 require 'json'
 require 'net/http'
 require 'ipaddress'
-require 'netconfig'
+require 'bandshell/netconfig'
 require 'sys/uptime'
 require 'sys/proctable'
 include Sys
@@ -317,4 +317,3 @@ class ConcertoConfigServer < Sinatra::Base
 	
 end
 
-ConcertoConfigServer.run!
