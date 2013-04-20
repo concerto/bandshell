@@ -27,7 +27,7 @@ class Module
     end
 end
 
-module ConcertoConfig
+module Bandshell
     # The Debian interfaces configuration file we are going to write out.
     INTERFACES_FILE='/etc/network/interfaces'
 
@@ -459,8 +459,8 @@ module ConcertoConfig
 			}
 		end
 
-        connection_method_class = ConcertoConfig.const_get(args['connection_method'])
-        addressing_method_class = ConcertoConfig.const_get(args['addressing_method'])
+        connection_method_class = Bandshell.const_get(args['connection_method'])
+        addressing_method_class = Bandshell.const_get(args['addressing_method'])
 
         connection_method = connection_method_class.new(
             args['connection_method_args']

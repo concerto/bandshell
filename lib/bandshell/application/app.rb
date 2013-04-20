@@ -13,13 +13,13 @@ class ConcertoConfigServer < Sinatra::Base
 	# push these over to netconfig.rb?
 	# Our list of available physical-layer connection methods...
 	CONNECTION_METHODS = [ 
-		ConcertoConfig::WiredConnection, 
-		ConcertoConfig::WirelessConnection 
+		Bandshell::WiredConnection, 
+		Bandshell::WirelessConnection 
 	]
 	# ... and available layer-3 addressing methods.
 	ADDRESSING_METHODS = [ 
-		ConcertoConfig::DHCPAddressing, 
-		ConcertoConfig::StaticAddressing 
+		Bandshell::DHCPAddressing, 
+		Bandshell::StaticAddressing 
 	]
 
 	# Hosts we allow to access configuration without authenticating.
@@ -60,7 +60,7 @@ class ConcertoConfigServer < Sinatra::Base
 		# password to be considered authorized.
 		def authorized?
 			ip = IPAddress.parse(request.env['REMOTE_ADDR'])
-			password = ConcertoConfig::ConfigStore.read_config(
+			password = Bandshell::ConfigStore.read_config(
 				'password', 'default'
 			)
 			if LOCALHOSTS.include? ip
@@ -75,13 +75,13 @@ class ConcertoConfigServer < Sinatra::Base
 
 		# Get our base URL from wherever it may be stored.
 		def concerto_url
-			ConcertoConfig::ConfigStore.read_config('concerto_url', '')
+			Bandshell::ConfigStore.read_config('concerto_url', '')
 		end
 
 		# Try to figure out what our current IPv4 address is
 		# and return it as a string.
 		def my_ip
-			iface = ConcertoConfig.configured_interface
+			iface = Bandshell.configured_interface
 			if iface
 				iface.ip
 			else
@@ -92,7 +92,7 @@ class ConcertoConfigServer < Sinatra::Base
 		# Check if we have something resembling a network connection.
 		# This means we found a usable interface and it has an IPv4 address.
 		def network_ok
-			iface = ConcertoConfig.configured_interface
+			iface = Bandshell.configured_interface
 			if iface
 				if iface.ip != "0.0.0.0"
 					true
@@ -174,7 +174,7 @@ class ConcertoConfigServer < Sinatra::Base
 		url = params[:url]
 		if validate_url(url)
 			# save to the configuration store
-			ConcertoConfig::ConfigStore.write_config('concerto_url', url)
+			Bandshell::ConfigStore.write_config('concerto_url', url)
 
 			# root will now redirect to the proper concerto_url
 			redirect '/screen'
@@ -200,7 +200,7 @@ class ConcertoConfigServer < Sinatra::Base
 		# is not implemented. This is also how we get away with just having
 		# one instance each of the config classes that are currently selected.
 		begin
-			cm, am = ConcertoConfig.read_network_config
+			cm, am = Bandshell.read_network_config
 		rescue Errno::ENOENT
 			cm = nil
 			am = nil
@@ -275,17 +275,17 @@ class ConcertoConfigServer < Sinatra::Base
 		do_assign(amargs, am)
 
 		# Save the configuration file.
-		ConcertoConfig.write_network_config(cm, am)
+		Bandshell.write_network_config(cm, am)
 
 		# Reload network configuration.
 		STDERR.puts "Trying to bring down the interface"
-		if ConcertoConfig.configured_interface
-			ConcertoConfig.configured_interface.ifdown
+		if Bandshell.configured_interface
+			Bandshell.configured_interface.ifdown
 		end
 		STDERR.puts "Rewriting configuration files"
-		ConcertoConfig::configure_system_network
+		Bandshell::configure_system_network
 		STDERR.puts "Bringing interface back up"
-		ConcertoConfig.configured_interface.ifup
+		Bandshell.configured_interface.ifup
 
 		# Back to the network form.
 		redirect '/netconfig' # as a get request
@@ -304,7 +304,7 @@ class ConcertoConfigServer < Sinatra::Base
 			redirect '/password'
 		end
 		
-		ConcertoConfig::ConfigStore.write_config('password', params[:newpass])
+		Bandshell::ConfigStore.write_config('password', params[:newpass])
 		redirect '/setup'
 	end
 	

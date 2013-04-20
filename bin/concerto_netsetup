@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'concerto_client/netconfig'
+require 'bandshell/netconfig'
 
-ConcertoConfig::configure_system_network
+Bandshell::configure_system_network
 

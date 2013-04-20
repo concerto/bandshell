@@ -19,7 +19,7 @@
                     %option{:value=>""}="Auto Select"
                     / list out available interfaces and their MAC addresses
                     / preselect one if there was one chosen in config
-                    - ConcertoConfig::WiredConnection.interfaces.each do |iface|
+                    - Bandshell::WiredConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name)==iface.name}="#{iface.name} - #{iface.mac}"
         #WirelessConnection
             %h3="Wireless Connection Settings (no encryption)"
@@ -28,7 +28,7 @@
                 %select#interface_name{:name=>"WirelessConnection/interface_name"}
                     %option{:value=>""}="Auto Select"
                     / same as above but with the wireless interfaces
-                    - ConcertoConfig::WirelessConnection.interfaces.each do |iface|
+                    - Bandshell::WirelessConnection.interfaces.each do |iface|
                         %option{:value=>iface.name, :selected=>value_from(connection_method, :interface_name) == iface.name}="#{iface.name} - #{iface.mac}"
             %p
                 %label{:for=>"WirelessConnection_ssid"}="SSID"
