@@ -169,7 +169,7 @@ class ConcertoConfigServer < Sinatra::Base
 			# The network settings are not sane, we don't have an IP.
 			# Redirect the user to the network configuration page to 
 			# take care of this.
-			#redirect '/netconfig'
+			redirect '/netconfig'
 		end
 	end
 
