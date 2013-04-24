@@ -5,12 +5,18 @@ require 'tempfile'
 module Bandshell
 	module LiveImage
 		def self.mountpoint
-			'/live/image'
+			if File.exist? '/etc/concerto/medium_path'
+				IO.read('/etc/concerto/medium_path').chomp
+			else
+				nil
+			fi
 		end
 
 		def self.readonly?
 			# on a readonly file system this will fail
-			if not File.exist? self.mountpoint
+			if self.mountpoint.nil?
+				true
+			elsif not File.exist? self.mountpoint
 				true
 			else
 				begin
