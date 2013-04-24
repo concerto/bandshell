@@ -11,7 +11,7 @@ module Bandshell
 				# sane default for Debian Live-based systems
 				# (as of 2013-04-24)
 				'/lib/live/mount/medium'
-			fi
+			end
 		end
 
 		def self.readonly?
