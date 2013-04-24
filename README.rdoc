@@ -14,7 +14,7 @@ Bandshell has three main components:
 
 * Build the Bandshell gem with "gem build bandshell.gemspec"
 * Run "sudo gem install bandshell-xxx.gem"
-* Run "ruby web/app.rb" to launch the Sinatra application and go to http://127.0.0.1:4567
+* Run "./bin/bandshelld run" to launch the Sinatra daemon and go to http://127.0.0.1:4567
 
 == Documentation
 

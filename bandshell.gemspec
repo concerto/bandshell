@@ -2,10 +2,10 @@ require 'rake'
 
 Gem::Specification.new do |s|
 	s.name			= 'bandshell'
-	s.version		= '0.0.18'
-	s.date			= '2013-04-20'
+	s.version		= '0.0.19'
+	s.date			= '2013-04-24'
 	s.summary		= 'Concerto Client Tools'
-	s.description	= 'Client-side tools for Concerto digital signage'
+	s.description	        = 'Client-side tools for Concerto digital signage'
 	s.authors		= ['Andrew Armenia']
 	s.email			= 'andrew@asquaredlabs.com'
 	s.add_dependency "sinatra"
