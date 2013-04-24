@@ -8,15 +8,15 @@ module Bandshell
 			if File.exist? '/etc/concerto/medium_path'
 				IO.read('/etc/concerto/medium_path').chomp
 			else
-				nil
+				# sane default for Debian Live-based systems
+				# (as of 2013-04-24)
+				'/lib/live/mount/medium'
 			fi
 		end
 
 		def self.readonly?
 			# on a readonly file system this will fail
-			if self.mountpoint.nil?
-				true
-			elsif not File.exist? self.mountpoint
+			if not File.exist? self.mountpoint
 				true
 			else
 				begin
