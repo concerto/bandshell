@@ -2,8 +2,8 @@ require 'rake'
 
 Gem::Specification.new do |s|
 	s.name			= 'bandshell'
-	s.version		= '0.0.12'
-	s.date			= '2013-04-19'
+	s.version		= '0.0.18'
+	s.date			= '2013-04-20'
 	s.summary		= 'Concerto Client Tools'
 	s.description	= 'Client-side tools for Concerto digital signage'
 	s.authors		= ['Andrew Armenia']
