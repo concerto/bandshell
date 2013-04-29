@@ -13,6 +13,9 @@ class ConcertoConfigServer < Sinatra::Base
 	# set paths relative to this file's location
 	set :root, File.dirname(__FILE__)
 
+	# listen on all IPv4 and IPv6 interfaces
+	set :bind, '::'
+
 	# push these over to netconfig.rb?
 	# Our list of available physical-layer connection methods...
 	CONNECTION_METHODS = [ 
