@@ -30,8 +30,9 @@ class ConcertoConfigServer < Sinatra::Base
 
 	# Hosts we allow to access configuration without authenticating.
 	LOCALHOSTS = [ 
-		IPAddress.parse("127.0.0.1"), 
-		IPAddress.parse("::1") 
+		IPAddress.parse("127.0.0.1"),		# ipv4 
+		IPAddress.parse("::ffff:127.0.0.1"),	# ipv6-mapped ipv4
+		IPAddress.parse("::1")			# ipv6
 	]
 
 	set :haml, { :format => :html5, :layout => :main }
