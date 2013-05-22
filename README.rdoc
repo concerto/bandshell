@@ -1,6 +1,6 @@
 = Concerto Bandshell
 
-Bandshell is an optional part of the {Concerto}{http://www.github.com/concerto/concerto} Digital Signage system (v2). It interfaces with Concerto's API to manage installation and configuration of a screen, and then takes over for local management of firmware and configuration updates, and day-to-day operation of the browser viewer.
+Bandshell is an optional part of the Concerto[http://www.github.com/concerto/concerto] Digital Signage system (v2). It interfaces with Concerto's API to manage installation and configuration of a screen, and then takes over for local management of firmware and configuration updates, and day-to-day operation of the browser viewer.
 
 Bandshell has three main components:
 
@@ -18,7 +18,7 @@ Bandshell has three main components:
 
 == Documentation
 
-Further documentation on this software will be stored in the Bandshell wiki on github (link forthcoming). For general Concerto v2 Documentation, see the {Concerto Wiki}{http://github.com/concerto/concerto/wiki}
+Further documentation on this software will be stored in the Bandshell wiki on github (link forthcoming). For general Concerto v2 Documentation, see the {Concerto Wiki}[http://github.com/concerto/concerto/wiki]
 
 The public website for Concerto is at http://www.concerto-signage.org.
 
