@@ -10,6 +10,9 @@ require 'sys/proctable'
 include Sys
 
 class ConcertoConfigServer < Sinatra::Base
+	# default to production, not development
+	set :environment, (ENV['RACK_ENV'] || :production).to_sym
+
 	# set paths relative to this file's location
 	set :root, File.dirname(__FILE__)
 
