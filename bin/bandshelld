@@ -7,5 +7,5 @@ require "daemons"
 require "bandshell/application/app"
 
 Daemons.run_proc("bandshelld", :dir_mode => (ConcertoConfigServer.development? ? :normal : :system)) do
-	ConcertoConfigServer.run!
+  ConcertoConfigServer.run!
 end

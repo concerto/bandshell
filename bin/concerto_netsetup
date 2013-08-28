@@ -3,4 +3,3 @@
 require 'bandshell/netconfig'
 
 Bandshell::configure_system_network
-
