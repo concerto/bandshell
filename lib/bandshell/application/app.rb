@@ -174,6 +174,7 @@ class ConcertoConfigServer < Sinatra::Base
     if network_ok
       # Everything's up and running, we just don't know what 
       # our URL should be.
+      @url=Bandshell::ConfigStore.read_config('concerto_url')
       haml :setup
     else
       # The network settings are not sane, we don't have an IP.
@@ -196,7 +197,10 @@ class ConcertoConfigServer < Sinatra::Base
     else
       # the URL was no good, back to setup!
       # error handling flash something something something
-      redirect '/setup'
+      @errors = []
+      @errors << 'Failed to set URL: Could not connect to Concerto Server.'
+      @url = url
+      haml :setup
     end
   end
 

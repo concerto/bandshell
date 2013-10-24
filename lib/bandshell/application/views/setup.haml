@@ -3,10 +3,15 @@
 	You're seeing this because your Concerto player has not yet been configured.
 	We need the URL of your Concerto instance before we can get up and running.
 
+- unless @errors.nil?
+	- @errors.each do |error|
+		%p{:style=>'color:red'}= error
+		
+
 %form{:method=>'post'}
 	%p
 		%label{:for=>'url'} URL
-		%input{:type=>'text', :name=>'url'}
+		%input{:type=>'text', :name=>'url', :value=>@url}
 		%input{:type=>'submit', :value=>'Here it is!'}
 
 %p
