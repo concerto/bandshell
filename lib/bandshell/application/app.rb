@@ -19,6 +19,11 @@ class ConcertoConfigServer < Sinatra::Base
   # listen on all IPv4 and IPv6 interfaces
   set :bind, '::'
 
+  configure :development do
+    require "sinatra/reloader"
+    register Sinatra::Reloader
+  end
+
   # push these over to netconfig.rb?
   # Our list of available physical-layer connection methods...
   CONNECTION_METHODS = [ 
