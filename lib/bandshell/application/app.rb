@@ -5,6 +5,7 @@ require 'json'
 require 'net/http'
 require 'ipaddress'
 require 'bandshell/netconfig'
+require 'bandshell/hardware_api'
 require 'sys/uptime'
 require 'sys/proctable'
 include Sys
@@ -22,6 +23,8 @@ class ConcertoConfigServer < Sinatra::Base
   configure :development do
     require "sinatra/reloader"
     register Sinatra::Reloader
+    puts 'Bandshell Config Server starting in development mode.'
+    @@no_netconfig=true
   end
 
   # push these over to netconfig.rb?
@@ -107,6 +110,7 @@ class ConcertoConfigServer < Sinatra::Base
     # Check if we have something resembling a network connection.
     # This means we found a usable interface and it has an IPv4 address.
     def network_ok
+      return true if @@no_netconfig
       iface = Bandshell.configured_interface
       if iface
         if iface.ip != "0.0.0.0"
@@ -161,7 +165,16 @@ class ConcertoConfigServer < Sinatra::Base
       # check if the concerto server is reachable, if so redirect there
       # if not redirect to a local error message screen
       if validate_url(concerto_url)
-        redirect concerto_url
+        if Bandshell::HardwareApi.attempt_to_get_screen_data! == :stat_success 
+          # Render the authenticate view which includes js to authenticate
+          # the browser and then redirect to the frontend.
+          @display_temp_token = nil # Disable the other features of the view
+          return haml :authenticate
+        else
+          # Authenticate action will manage the whole authentication process,
+          # picking up wherever we last left off.
+          redirect '/authenticate'
+        end
       else
         redirect '/problem'
       end
@@ -208,6 +221,30 @@ class ConcertoConfigServer < Sinatra::Base
   # this page redirects to / every 5 seconds
   get '/problem' do
     haml :problem
+  end
+
+  get '/authenticate' do
+    # Following call will get a temp token if we need it
+    Bandshell::HardwareApi.attempt_to_get_screen_data!
+
+    # If we don't have a temp token that means we are authenticated
+    # or there was trouble communicating with the server.
+    if Bandshell::HardwareApi.have_temp_token?
+      @display_temp_token = Bandshell::HardwareApi.temp_token
+    end
+    return haml :authenticate
+  end
+
+  get '/authenticate.json' do
+    result = {:accepted => 0}
+    if Bandshell::HardwareApi.attempt_to_get_screen_data! == :stat_success
+      result[:accepted] = 1
+      result[:url] = Bandshell::HardwareApi.screen_url
+      result[:user] = "screen"
+      result[:pass] = Bandshell::HardwareApi.auth_token
+    end
+    content_type :json
+    result.to_json
   end
 
   get '/netconfig' do
