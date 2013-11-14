@@ -19,12 +19,21 @@ class ConcertoConfigServer < Sinatra::Base
 
   # listen on all IPv4 and IPv6 interfaces
   set :bind, '::'
+  
+  # Provide an option to skip network settings when developing
+  set :no_netconfig, false
 
   configure :development do
-    require "sinatra/reloader"
-    register Sinatra::Reloader
     puts 'Bandshell Config Server starting in development mode.'
-    @@no_netconfig=true
+    begin
+      require "sinatra/reloader"
+      register Sinatra::Reloader
+    rescue LoadError
+      puts '  Reloading is not enabled, however.'
+      puts '  You can enable limited app.rb reloading in development by'
+      puts '  installing the sinatra-contrib gem on your system.'   
+    end 
+    set :no_netconfig, true
   end
 
   # push these over to netconfig.rb?
@@ -110,7 +119,7 @@ class ConcertoConfigServer < Sinatra::Base
     # Check if we have something resembling a network connection.
     # This means we found a usable interface and it has an IPv4 address.
     def network_ok
-      return true if @@no_netconfig
+      return true if settings.no_netconfig
       iface = Bandshell.configured_interface
       if iface
         if iface.ip != "0.0.0.0"
