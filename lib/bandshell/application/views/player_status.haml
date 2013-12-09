@@ -1,8 +1,11 @@
-System Uptime: #{Uptime.uptime}
+%p System Uptime: #{Uptime.uptime}
 
-System Processes:
-%br/
-- for p in @proctable
-  %b= p.comm
-  (PID #{p.pid.to_s})
-  %br/
+%p System Processes:
+%ul
+  - for p in @proctable
+    %li
+      %b= p.comm
+      (PID #{p.pid.to_s})
+
+%p Screen on/off rules:
+%pre= JSON.pretty_generate(@on_off_rules)

@@ -377,7 +377,71 @@ class ConcertoConfigServer < Sinatra::Base
   #Requires ffi, sys-uptime, and sys-proctable gems
   get '/player_status' do
     @proctable = ProcTable.ps
+    @on_off_rules = @@screen_on_off
     haml :player_status
   end  
+
+  # Should be fetched at a regular interval by the background job
+  # to execute system maintenance functions such as updating configs
+  # from Concerto, and performing screen on/off control.
+  get '/background-job' do
+    if update_player_info
+      "Update executed"
+    else
+      "update_player_info failed."
+    end
+  end
+
+  # TODO: Refactor player settings management into a separate class
+ 
+  @@player_data_updated=Time.new(0)
+  @@screen_on_off=[{:action=>"on"}] # default to always-on
+
+  # Fetches the latest player settings from Concerto if the current
+  # settings are too old or an update is forced (force=true).
+  # TODO: Store settings in BandshellConfig (and update whenever they have
+  # changed) so that configs are immediately available at boot.
+  def update_player_info(force=false)
+    # TODO: Configurable update interval
+    if force or (@@player_data_updated < Time.now - 60*5)
+      data = Bandshell::HardwareApi::get_player_info
+      if data.nil?
+        puts "update_player_info: Error: Recieved null data from get_player_info!"
+        false
+      else
+        new_rules = parse_screen_on_off(data['screen_on_off'])
+        if new_rules.nil?
+          false
+        else
+          puts "update_player_info: Updating the rules!"
+          @@screen_on_off = new_rules
+          @@player_data_updated = Time.now
+        end
+      end
+    else
+      true
+    end
+  end
+
+  def parse_screen_on_off(data)
+    begin
+      rules = JSON.parse(data)
+      if rules.is_a? Array
+        return rules
+      else
+        puts "parse_screen_on_off: Recieved something other than an aray."
+        return nil
+      end
+    rescue
+      puts "parse_screen_on_off: invalid JSON recieved"
+      return nil
+    end
+  end
+
+  # Returns true if the screen should be turned on right now,
+  # according to the latest data recieved from concerto-hardware.
+  def screen_scheduled_on?
+    raise 'screen_scheduled_on?: TODO'
+  end
 
 end
