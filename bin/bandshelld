@@ -12,4 +12,12 @@ Daemons.run_proc("bandshelld", :log_output=>true, :dir_mode => dir_mode) do
   ConcertoConfigServer.run!
 end
 
-Daemons.run("bin/bandshell-timer.rb", :log_output=>true, :dir_mode => dir_mode)
+bandshell_url = "http://localhost:" + ConcertoConfigServer.settings.port.to_s
+
+timer_argv = ARGV.dup
+timer_argv << "--" unless timer_argv.include? "--"
+timer_argv << bandshell_url
+
+Daemons.run("bin/bandshell-timer.rb", 
+            :log_output=>true, :dir_mode => dir_mode,
+            :ARGV => timer_argv)
