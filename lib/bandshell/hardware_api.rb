@@ -141,6 +141,40 @@ module Bandshell
       end
       return false
     end
-  end
+
+    public
+
+    # Fetch player settings from concerto-hardware
+    # TODO: clean up errors/ return values
+    def get_player_info
+      return nil if auth_token.empty?
+
+      # Try to do this in one GET.
+      player_info_uri = URI::join(concerto_url,'hardware/',
+                                 'players/','current.json')
+
+      response = get_with_auth(player_info_uri, 'screen', auth_token)
+      if response.nil?
+        return :stat_serverr
+      end
+        
+      if response.code != "200"
+        return :stat_serverr
+      end
+      
+      begin
+        data = JSON.parse(response.body)
+        if data.has_key? 'screen_on_off'
+          # We actually got some data
+          return data
+        else
+          return :stat_badauth
+        end
+      rescue
+        return :stat_serverr
+      end
+    end
+
+    end # class << self
   end # module HardwareApi
 end # module Bandshell
