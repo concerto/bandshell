@@ -116,6 +116,12 @@ class ConcertoConfigServer < Sinatra::Base
       end
     end
 
+    # Try to figure out what our current port is 
+    # and return it as a string.
+    def my_port
+      settings.port
+    end
+
     # Check if we have something resembling a network connection.
     # This means we found a usable interface and it has an IPv4 address.
     def network_ok
