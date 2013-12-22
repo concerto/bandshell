@@ -1,0 +1,16 @@
+<p>System Uptime: <%= Uptime.uptime %></p>
+<p>System Processes:</p>
+<ul>
+  <% for p in @proctable %>
+    <li>
+      <b>
+        <%= p.comm %>
+      </b>
+      (PID <%= p.pid.to_s %>)
+    </li>
+  <% end %>
+</ul>
+<p>Screen on/off rules:</p>
+<pre>
+  <%= JSON.pretty_generate(@on_off_rules) %>
+</pre>

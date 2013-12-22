@@ -1,9 +1,9 @@
 require 'rubygems'
 require 'sinatra/base'
-require 'haml'
 require 'json'
 require 'net/http'
 require 'ipaddress'
+require 'haml'
 require 'bandshell/netconfig'
 require 'bandshell/hardware_api'
 require 'sys/uptime'
@@ -55,7 +55,8 @@ class ConcertoConfigServer < Sinatra::Base
     IPAddress.parse("::1")      # ipv6
   ]
 
-  set :haml, { :format => :html5, :layout => :main }
+  #set :haml, { :format => :html5, :layout => :main }
+  set :erb, { :format => :html5, :layout => :main }
 
   helpers do
     # Get the return value of the method on obj if obj supports the method.
@@ -184,7 +185,7 @@ class ConcertoConfigServer < Sinatra::Base
           # Render the authenticate view which includes js to authenticate
           # the browser and then redirect to the frontend.
           @display_temp_token = nil # Disable the other features of the view
-          return haml :authenticate
+          return erb :authenticate
         else
           # Authenticate action will manage the whole authentication process,
           # picking up wherever we last left off.
@@ -203,7 +204,7 @@ class ConcertoConfigServer < Sinatra::Base
       # Everything's up and running, we just don't know what 
       # our URL should be.
       @url=Bandshell::ConfigStore.read_config('concerto_url')
-      haml :setup
+      erb :setup
     else
       # The network settings are not sane, we don't have an IP.
       # Redirect the user to the network configuration page to 
@@ -228,14 +229,14 @@ class ConcertoConfigServer < Sinatra::Base
       @errors = []
       @errors << 'Failed to set URL: Could not connect to Concerto Server.'
       @url = url
-      haml :setup
+      erb :setup
     end
   end
 
   # render a page indicating that the concerto_url is no good.
   # this page redirects to / every 5 seconds
   get '/problem' do
-    haml :problem
+    erb :problem
   end
 
   get '/authenticate' do
@@ -247,7 +248,7 @@ class ConcertoConfigServer < Sinatra::Base
     if Bandshell::HardwareApi.have_temp_token?
       @display_temp_token = Bandshell::HardwareApi.temp_token
     end
-    return haml :authenticate
+    return erb :authenticate
   end
 
   get '/authenticate.json' do
@@ -279,7 +280,7 @@ class ConcertoConfigServer < Sinatra::Base
 
     # view will grab what it can from our existing 
     # connection/addressing methods using value_from().
-    haml :netsettings, :locals => { 
+    erb :netsettings, :locals => { 
         :connection_method => cm, 
         :addressing_method => am 
       }
@@ -364,7 +365,7 @@ class ConcertoConfigServer < Sinatra::Base
 
   get '/password' do
     protected!
-    haml :password
+    erb :password
   end
 
   post '/password' do
@@ -384,7 +385,7 @@ class ConcertoConfigServer < Sinatra::Base
   get '/player_status' do
     @proctable = ProcTable.ps
     @on_off_rules = @@screen_on_off
-    haml :player_status
+    erb :player_status
   end  
 
   # Should be fetched at a regular interval by the background job

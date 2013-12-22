@@ -1,0 +1,115 @@
+<script src="/javascripts/network.js"></script>
+<a href="/setup">
+  <%= "Back to setup" %>
+</a>
+<h1>
+  <%= "Concerto Player Network Configuration" %>
+</h1>
+<form method="post">
+  <h2>
+    <%= "Connection Type" %>
+  </h2>
+  <select id="connection_type" name="connection_type">
+    <!--  list out our available connection methods as options
+          set the html selected flag on the one that is currently selected in the config -->
+    <% CONNECTION_METHODS.each do |cm| %>
+      <option <%= cm==connection_method.class ? 'selected' : '' %> value="<%= cm.basename %>">
+        <%= cm.description %>
+      </option>
+    <% end %>
+  </select>
+
+  <div id="connection">
+    <div id="WiredConnection">
+      <h3>
+        Wired Connection Settings
+      </h3>
+      <p>
+        <label for="WiredConnection_interface_name">
+          Interface Name
+        </label>
+        <select id="interface_name" name="WiredConnection/interface_name">
+          <!--  list out available interfaces and their MAC addresses - preselect one if there was one chosen in config -->
+          <option value="">Auto Select</option>
+          <% Bandshell::WiredConnection.interfaces.each do |iface| %>
+            <option <%= value_from(connection_method, :interface_name)==iface.name ? 'selected' : '' %> value="<%= iface.name %>">
+              <%= iface.name %> - <%= iface.mac %>
+            </option>
+          <% end %>
+        </select>
+      </p>
+    </div>
+    <div id="WirelessConnection">
+      <h3>
+        Wireless Connection Settings (no encryption)
+      </h3>
+      <p>
+        <label for="WirelessConnection_interface_name">
+          Interface Name
+        </label>
+        <select id="interface_name" name="WirelessConnection/interface_name">
+          <!--  same as above but with the wireless interfaces -->
+          <option value="">Auto Select</option>
+          <% Bandshell::WirelessConnection.interfaces.each do |iface| %>
+            <option <%= value_from(connection_method, :interface_name) == iface.name ? 'selected' : '' %> value="<%= iface.name %>">
+              <%= iface.name %> - <%= iface.mac %>
+            </option>
+          <% end %>
+        </select>
+      </p>
+      <p>
+        <label for="WirelessConnection_ssid">
+          SSID
+        </label>
+        <input name="WirelessConnection/ssid" type="text" value="<%= value_from(connection_method, :ssid) %>"></input>
+      </p>
+
+    </div>
+  </div>
+
+  <h2>
+    IP Address
+  </h2>
+  <select id="addressing_type" name="addressing_type">
+    <% ADDRESSING_METHODS.each do |am| %>
+      <option <%= am==addressing_method.class ? 'selected' : '' %> value="<%= am.basename %>">
+        <%= am.description %>
+      </option>
+    <% end %>
+  </select>
+  <div id="address">
+    <div id="DHCPAddressing"></div>
+    <div id="StaticAddressing">
+      <h3>
+        Static Address Settings
+      </h3>
+      <p>
+        <label for="StaticAddressing_address">
+          Address
+        </label>
+        <input name="StaticAddressing/address" type="text" value="<%= value_from(addressing_method, :address) %>"></input>
+      </p>
+      <p>
+        <label for="StaticAddressing_netmask">
+          Netmask
+        </label>
+        <input name="StaticAddressing/netmask" type="text" value="<%= value_from(addressing_method, :netmask) %>"></input>
+      </p>
+      <p>
+        <label for="StaticAddressing_gateway">
+          Gateway
+        </label>
+        <input name="StaticAddressing/gateway" type="text" value="<%= value_from(addressing_method, :gateway) %>"></input>
+      </p>
+      <p>
+        <label for="StaticAddressing_address">
+          Nameservers (separate with commas or spaces)
+        </label>
+        <input name="StaticAddressing/nameservers_flat" type="text" value="<%= value_from(addressing_method, :nameservers_flat) %>"></input>
+      </p>
+    </div>
+  </div>
+  <input type="submit"></input>
+
+
+</form>

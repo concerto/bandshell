@@ -1,0 +1,15 @@
+<script src="/javascripts/authenticate.js"></script>
+<h1>Concerto Player Authentication</h1>
+<div id="no-js">
+  It looks like Javascript is disabled. The Concerto Display will not work.
+</div>
+<% unless @display_temp_token.nil? %>
+  <div id="instructions">
+    Please enter the following token when setting up the screen in the 
+    Concerto Panel:
+    <%= @display_temp_token %>
+  </div>
+<% end %>
+<div id="status">
+  Waiting for first update...
+</div>
