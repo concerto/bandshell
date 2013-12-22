@@ -20,7 +20,7 @@ p {
 // --------
 
 @mixin header-base {
- 	font-family: $sans-headers;
+  font-family: $sans-headers;
   line-height: normal;
 
   small {
@@ -29,36 +29,36 @@ p {
   }
 }
 
-h1 {
- 	@include header-base;
-	font-size: 30px;
- 	font-weight: 400;
+h1, .h1 {
+  @include header-base;
+  font-size: 30px;
+  font-weight: 400;
 
- 	&.header {
-   	text-transform: uppercase;
-   	font-size: 1.3em;
-   	letter-spacing: 0.15em;
-   	padding: 6px 0;
-   	margin-bottom: 16px; 
-	}
-	
- 	&.indented {
-   	padding-left: 8px !important; 
-	}
-	
- 	&.subpage_header {
-   	font-size: 3em;
-   	margin-bottom: 8px !important; 
-	}
-	
+  &.header {
+    text-transform: uppercase;
+    font-size: 1.3em;
+    letter-spacing: 0.15em;
+    padding: 6px 0;
+    margin-bottom: 16px; 
+  }
+  
+  &.indented {
+    padding-left: 8px !important; 
+  }
+  
+  &.subpage_header {
+    font-size: 3em;
+    margin-bottom: 8px !important; 
+  }
+  
   small {
     font-size: 18px;
-	}
-	
+  }
+  
 }
 
-h2 {
- 	@include header-base;
+h2, .h2 {
+  @include header-base;
   font-size: 24px; 
 
   small {
@@ -67,8 +67,8 @@ h2 {
 
 }
 
-h3 {
- 	@include header-base;
+h3, .h3 {
+  @include header-base;
   font-size: 18px; 
 
   small {
@@ -77,8 +77,8 @@ h3 {
 
 }
 
-h4 {
- 	@include header-base;
+h4, .h4 {
+  @include header-base;
   font-size: 16px; 
 
   small {
@@ -87,23 +87,23 @@ h4 {
 
 }
 
-h5 {
- 	@include header-base;
-	font-size: 14px; 
+h5, .h5 {
+  @include header-base;
+  font-size: 14px; 
 }
 
-h6 {
-	@include header-base;
+h6, .h6 {
+  @include header-base;
 }
 
-h7 {
-	@include header-base;
+h7, .h7 {
+  @include header-base;
 }
 
 .header-with-icon {
-  border-bottom: solid 1px #eee;
+  border-bottom: solid 1px #ccc;
 
-  [class^="icon-header-"], [class*=" icon-header-"] {
+  [class^="concertocon-header-"], [class*=" concertocon-header-"] {
     background-color: $white;
     margin-top: -10px; 
     margin-bottom: -10px; 
@@ -244,15 +244,16 @@ pre {
 // ------
 
 .label {
-  padding: 1px 3px 2px;
+  padding: 4px;
   font-size: $basefont * .75;
   font-weight: bold;
   color: $white;
-  text-transform: uppercase;
   white-space: nowrap;
-  background-color: $grayLight;
+  background-color: darken($gray, 5%);
   &.important { background-color: #c43c35; }
   &.warning   { background-color: $orange; }
   &.success   { background-color: $green; }
   &.notice    { background-color: lighten($blue, 25%); }
+
+  a { color: $white; }
 }

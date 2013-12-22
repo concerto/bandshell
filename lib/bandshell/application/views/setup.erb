@@ -6,33 +6,53 @@
   <% end %>
 <% end %>
 
-<h3 class="center">We need the URL of your Concerto instance before we can get up and running.</h3>
+<div class="clearfix">
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="/setup">Basic Setup</a></li>
+    <li><a href="/netconfig">Network Settings</a></li>
+    <li><a href="/password">Configuration Password</a></li>
+  </ul>
+</div>
 
-<form method="post">
-  <fieldset style="padding-left: 20px; padding-top: 0px;">
-    <div class="clearfix">
-      <label for="url">URL</label>
-      <div class="input">
-        <input id="url" name="url" class="input-xxlarge" type="text" value="<%= @url %>" /> <input type="submit" class="btn" value="Here it is!" />
+<div class="default-padding">
+  <h3>We need the URL of your Concerto instance before we can get up and running.</h3>
+  <br />
+
+  <form method="post">
+    <fieldset style="padding: 0px;">
+      <div class="row-fluid">
+        <div class="span10">
+          <input id="url" name="url" placeholder="Enter URL (e.g. http://10.0.0.1)" class="fillWidth" style="margin-bottom: 6px;" type="text" value="<%= @url %>" />
+        </div>
+        <div class="span2">
+          <input type="submit" class="btn large btn-primary" value="Get Started" />
+        </div>
       </div>
-    </div>
-  </fieldset>
-</form>
+    </fieldset>
+  </form>
 
-<br /><br />
-<p>
-  The IPv4 address of this screen appears to be:
-  <%= my_ip %>
-</p>
-<p>
-  <p>This page can be accessed remotely via http://<%= my_ip %>:<%= my_port %>/setup</p>
-</p>
-<p>
-  Username is root, default password is 'default'.
-</p>
-<p>
-  Also, you may want to
-  <a href="/netconfig">change network settings</a>
-  or
-  <a href="/password">change the configuration password.</a>
-</p>
+  <br />
+
+  <div class="alert alert-block alert-zero">
+    <table style="margin: 0px;" cellpadding="0" cellspacing="0" border="0">
+      <tbody>
+        <tr>
+          <td><p>IP Address:</p></td>
+          <td><p><b class="pronounced"><%= my_ip %></b></p></td>
+        </tr>
+        <tr>
+          <td><p>Default Username:</p></td>
+          <td><p><b class="pronounced">root</b></p></td>
+        </tr>
+        <tr>
+          <td><p>Default Password:</p></td>
+          <td><p><b class="pronounced">default</b></p></td>
+        </tr>
+        <tr>
+          <td><p>Access this page with URL:</p></td>
+          <td><p><b class="pronounced"><a href="http://<%= my_ip %>:<%= my_port %>/setup">http://<%= my_ip %>:<%= my_port %>/setup</a></b></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

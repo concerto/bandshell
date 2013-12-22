@@ -5,30 +5,30 @@
 
 // viewblock
 .viewblock {
-	@include box-shadow(0 3px 2px #ababab);
+  @include box-shadow(0 3px 2px #ababab);
   display: block;
   margin-bottom: 18px;
   @include border-radius(8px 8px 0px 0px);
 
-	.viewblock-header {
-   	@include border-radius(8px 8px 0px 0px);
+  .viewblock-header {
+    @include border-radius(8px 8px 0px 0px);
     @include vertical-gradient( darken($grayLighter, 3%), darken($grayLight, 8%) );
     //background: #FFF image-url('layout/viewblock/header_bg.png') bottom left repeat-x;
     display: block;
     padding: 0px;
     border: solid 1px #ababab;
-   	border-bottom: 0px;
+    border-bottom: 0px;
 
     &.light-version {
       @include vertical-gradient( $grayLightest, $grayLighter );
     }
 
-   	h1 {
-   		color: darken($gray, 20%);
-   		font-size: 1.4em;
-   		letter-spacing: 0.05em;
-   		text-shadow: 0 1px $grayLighter;
-		}
+    h1 {
+      color: darken($gray, 20%);
+      font-size: 1.4em;
+      letter-spacing: 0.05em;
+      text-shadow: 0 1px darken($grayLighter, 5%);
+    }
 
     a:not(.button) { 
       color: #003366;
@@ -38,14 +38,14 @@
       padding: 8px 14px 5px 14px;
     }
 
-		// element inside the header that can be optionally used for right-aligned
-		// contextual buttons relevant to this section of the page
-		.viewblock-header_right {
-	  	float: right;
-	  	margin-left: 20px;
+    // element inside the header that can be optionally used for right-aligned
+    // contextual buttons relevant to this section of the page
+    .viewblock-header_right {
+      float: right;
+      margin-left: 20px;
 
-      .default-padding { padding: 6px; }
-		}
+      .button-padding { padding: 5px; }
+    }
 
     // status element that fits a label and a value, usually a count
     // often aligned or floated to the right side of .viewblock-header_right
@@ -76,20 +76,20 @@
       @include border-radius(0px 8px 0px 0px);
     }
 
-		// this element is only included when the back_button helper is used to place a back button
-		.viewblock-header_back {
-	  	float: left;
-	  	margin: 7px 8px 7px -12px;
-		}
+    // this element is only included when the back_button helper is used to place a back button
+    .viewblock-header_back {
+      float: left;
+      margin: 7px 8px 7px -12px;
+    }
 
-	}
+  }
 
-	.viewblock-cont {
-  	padding: 0px;
+  .viewblock-cont {
+    padding: 0px;
     border: solid 1px #ababab;
-		background: $white;
+    background: $white;
     @include clearfix();
-	}
+  }
 
   // .subnav is a light blue bar that appears below the content header
   .subnav {
@@ -182,8 +182,6 @@
 
 // subblock
 .subblock {
-  margin-bottom: 24px;
-
   &.bordered {
     border: solid 1px $grayLight;
     @include border-radius(6px);

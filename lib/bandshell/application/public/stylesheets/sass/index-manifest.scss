@@ -8,7 +8,6 @@
 @import "components/forms";
 @import "components/tables";
 @import "components/navs";
-@import "components/sprites";
 @import "components/buttons";
 @import "components/button-groups";
 @import "components/pagination";
@@ -25,6 +24,7 @@
 
 @import "views/submissions";
 @import "views/users";
+@import "views/setup";
 
 @import "responsive/responsive-utilities";
 @import "responsive/responsive-767px-max";

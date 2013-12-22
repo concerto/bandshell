@@ -13,7 +13,7 @@
 }
 
 @mixin no-box-shadow {
-	box-shadow: 0 0 0;
+  box-shadow: 0 0 0;
   -moz-box-shadow: 0 0 0;
   -webkit-box-shadow: 0 0 0;
 }
@@ -86,6 +86,15 @@
      -moz-box-sizing: $boxmodel;
       -ms-box-sizing: $boxmodel;
           box-sizing: $boxmodel;
+}
+
+
+// Background clipping (from bootstrap-sass)
+// Heads up: FF 3.6 and under need "padding" instead of "padding-box"
+@mixin background-clip($clip) {
+  -webkit-background-clip: $clip;
+     -moz-background-clip: $clip;
+          background-clip: $clip;
 }
 
 

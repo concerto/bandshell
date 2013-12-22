@@ -9,12 +9,12 @@
 
 body {
   @include sans-serif-font(normal,$basefont,$baseline);
-	margin: 0;
+  margin: 0;
   color: $grayDark;
 }
 
 #main {
-	padding: 15px 1% 15px 1%; 
+  padding: 15px 1% 15px 1%; 
 }
 
 
@@ -70,6 +70,6 @@ a {
 
 
 .with-shadow {
-	@include box-shadow(0 3px 2px $grayLighter);
+  @include box-shadow(0 3px 2px $grayLighter);
 }
 

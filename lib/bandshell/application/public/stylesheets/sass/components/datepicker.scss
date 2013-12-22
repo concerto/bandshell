@@ -14,8 +14,8 @@
   border-radius: 4px;
   direction: ltr;
   /*.dow {
-		border-top: 1px solid #ddd !important;
-	}*/
+    border-top: 1px solid #ddd !important;
+  }*/
 
 }
 .datepicker-inline {
@@ -334,10 +334,4 @@
 .datepicker .prev,
 .datepicker .next {
   font-style: normal;
-}
-.datepicker .prev:after {
-  content: "«";
-}
-.datepicker .next:after {
-  content: "»";
 }

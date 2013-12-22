@@ -8,7 +8,7 @@
 html {
 	// include background with retina mixin:
 	background: url(/images/layout/pagebg.gif) repeat;
-
+	
  	color: #000;
  	font-family: $sans-body;
 	//min-width: 800px;
@@ -118,4 +118,8 @@ small {
 
 .clear {
 	clear: both; 
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

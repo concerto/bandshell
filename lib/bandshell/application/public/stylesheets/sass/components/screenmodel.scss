@@ -9,7 +9,7 @@
   border: solid 2px #a6a6a6;
   border-bottom: solid 20px #a6a6a6;
   @include border-radius(4px);
-  @include box-shadow(0px 2px 6px #999);
+  @include box-shadow(0px 2px 2px #999);
 
   .inset {
     height: 100%;
@@ -21,6 +21,20 @@
   .pos {
     z-index: 99;
     position: absolute;
+  }
+
+  a.pos {
+    opacity: 0.1;
+    background: $concerto-blue-2;
+    $transition: opacity linear .1s, box-shadow linear .1s;
+    @include transition($transition);
+    
+    &:hover {
+      opacity: 0.8;
+      $shadow: 0 0 8px $concerto-blue-2; // rgba(82,168,236,.6);
+      @include box-shadow($shadow);
+      text-decoration: none;
+    }
   }
 
   .bottom {
@@ -37,8 +51,16 @@
       text-transform: uppercase;
       text-align: center;
       background: #000;
-      font-size: 2em;
+      font-size: 1em;
       border-radius: 5000px;
     }
+  }
+
+  &.screens-show {
+    max-width: 800px;
+    width: 800px;
+    margin: 0 auto;
+    height: 450px;
+    max-height: 450px;
   }
 }
