@@ -8,7 +8,6 @@ Gem::Specification.new do |s|
   s.authors    = ['Concerto Team']
   s.email      = 'team@concerto-signage.org'
   s.add_dependency "sinatra"
-  s.add_dependency "haml"  
   s.add_dependency "sys-uptime"   
   s.add_dependency "sys-proctable"
   s.add_dependency "ipaddress"
