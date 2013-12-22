@@ -1,0 +1,187 @@
+/*##########################################################################*/
+/*  Top Menu  */
+/*##########################################################################*/
+
+
+//////////////////
+
+/*##########  STRUCTURE  ##########*/
+
+#top-menu {
+ 	width: 100%;
+  @include vertical-gradient(#fbfbfb, #d5d5d5);
+  @include box-shadow(0px 1px 6px $gray);
+  border-bottom: solid 1px #999;
+  z-index: 2;
+  position: relative;
+  @include clearfix();
+	
+ 	.btn {
+
+		// custom attributes:
+		@include border-radius(6px);
+    background: transparent image-url('layout/top-menu/button_top-menu_states.png') top left repeat-x;
+    
+    // IE fix: reset Microsoft filter attribute:
+    filter: none;
+
+   	color: #666;
+   	text-shadow: 0 1px #eee;
+   	margin: 0px 2px;
+    padding: 4px 7px;
+    font-size: 11px;
+   	border: solid 1px #999;
+		float: left;
+
+   	&:hover {
+      background: transparent image-url('layout/top-menu/button_top-menu_states.png') top left repeat-x;
+     	text-shadow: 0 1px #eee;
+   		background-position: 100% -31px;
+   		border: solid 1px #2f84da;
+
+      .badge {
+        //background-color: $concerto-blue-1;
+        color: $white;
+
+        &.action {
+          background-color: $red;
+        }
+      }
+		}
+
+    &:active {
+      background: transparent image-url('layout/top-menu/button_top-menu_states.png') top left repeat-x;
+   		background-position: 100% -62px;
+   		border: solid 1px #333;
+		}
+
+		&:visited {
+			color:#666;
+		}
+		
+		&.selected {
+			@include box-shadow(inset 0 0 10px #000);
+    	text-decoration: none;
+    	text-shadow: 0 -1px #333333;
+    	color: #FFF;
+    	background-position: 100% 100%;
+    	border: solid 1px #333;
+	
+			&:active {
+				color: $white !important;
+      }
+
+      &:hover {
+        color: $white !important;
+      }
+			
+		}
+		
+	}
+
+  .badge {
+    background-color: #666;
+    color: $grayLighter;
+    text-shadow: 0 0 0;
+
+    &.action {
+      background-color: darken($red, 10%);
+    }
+  }
+	
+	#top-menu-logobutton {
+    @include vertical-gradient($concerto-blue-1, $concerto-blue-2);
+    float: left;
+    color: $white;
+    padding: 4px 12px;
+    font-weight: bold;
+    vertical-align: middle;
+
+    &.full {
+      height: 46px;
+      padding: 6px 12px;
+    }
+
+    // apply new background position on hover to show "lit up" version of logo bg:
+    &:hover i.icon-logobutton {
+      background-position: 0px -40px;
+    }
+  }
+
+  #top-menu-logintext {
+    float: left;
+    padding: 4px 12px;
+    margin: 0px;
+    color: $gray;
+    font-size: 0.85em;
+  }
+
+  #top-menu-user {
+
+    i {
+      display: block;
+      margin: 2px 0px;
+    }
+
+    h2 {
+      text-transform: uppercase;
+      font-size: 17px;
+
+      a {
+        color: $gray;
+        text-shadow: 0px 1px 0px $white;
+        letter-spacing: 0.15em;
+        font-size: 17px;
+      }
+    }
+
+    .pull-left {
+      padding-top: 2px;
+      margin-right: 12px;
+    }
+
+    .pull-right {
+      padding-top: 7px;
+      margin-right: 8px;
+
+      p {
+        font-size: 0.8em;
+      }
+    }
+  }
+	
+	// each part of the menu is a "section"
+	section {	
+    border-right:solid 1px #ccc; 
+  	float: left;
+  	margin: 0px;
+    padding-top: 4px;
+
+    &.right {
+      float: right;
+    }
+
+		.top-menu-sectop {
+      height: 34px;
+      padding: 0px 2px;
+		}
+		
+    .top-menu-secbot {
+      background: #f9f9f9;
+
+			h1 {
+				color: #666;
+		  	font-size: 0.75em;
+		  	font-weight: 400;
+		  	text-shadow: 0 0.05em #FFF;
+		  	padding: 3px 0px;
+		  	text-transform: uppercase;
+		  	letter-spacing: 0.3em;
+		  	text-align: center;
+			}
+			
+		}
+		
+	}
+	
+}

@@ -1,0 +1,238 @@
+a > .tile {
+  border: solid 1px darken($grayLighter, 5%);
+  
+  &, * { @include transition(0.1s all linear); }
+}
+
+a:hover > .tile {
+  background: $concerto-blue-5;
+  border-color: $concerto-blue-4;
+
+  * {
+    @include opacity(90);
+  }
+}
+
+.tile {
+  display: block;
+  float: left;
+  background-color: lighten($grayLighter, 5%);
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+  box-shadow: inset 0px 0px 1px #FFFFCC;
+  text-decoration: none;
+  color: $white;
+  margin: 0 10px 10px 0;
+  //overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+
+  // * {
+  //     color: $black;
+  // }
+
+  .tile-content {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      padding-bottom: 30px;
+      vertical-align: top;
+      padding: 10px 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+
+      color: $black;
+      line-height: 16px;
+
+      padding: 0;
+
+      & > img {
+          width: 100%;
+          height : auto;
+          //min-height: 100%;
+          max-width: 100%;
+      }
+
+      &:hover {
+        color: $linkColorHover;
+      }
+
+      .default-padding { padding: 6px; }
+
+      p {
+          color: $white;
+          line-height: 16px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          &:hover {
+              color: $white;
+          }
+      }
+  }
+
+  &.icon {
+      & > .tile-content {
+          padding: 0;
+
+          & > img {
+              position: absolute;
+              width: 64px;
+              height: 64px;
+              top: 50%;
+              left: 50%;
+              margin-left: -32px;
+              margin-top: -32px;
+          }
+  
+          & > i {
+              position: absolute;
+              width: 64px;
+              height: 64px;
+              top: 50%;
+              left: 50%;
+              margin-left: -32px;
+              margin-top: -32px;
+              font-size: 64px;
+          }
+      }
+  }
+
+  &.image, &.image-slider {
+      & > .tile-content {
+          padding: 0;
+
+          & > img {
+              width: 100%;
+              height : auto;
+              //min-height: 100%;
+              max-width: 100%;
+          }
+      }
+  }
+
+  &.image-set {
+      & > .tile-content {
+          margin: 0;
+          padding: 0;
+          width: 25% !important;
+          height: 50%;
+          float: left;
+          border: 1px #1e1e1e solid;
+
+          & > img {
+              min-width: 100%;
+              width: 100%;
+              height : auto;
+              min-height: 100%;
+          }
+      }
+
+      .tile-content:first-child {
+          width: 50% !important;
+          float: left;
+          height: 100%;
+      }
+  }
+
+  .brand, .tile-status {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      min-height: 30px;
+      background-color: transparent;
+      @include clearfix();
+
+      & > .count {
+          background: $black;
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          margin-bottom: 0;
+          color: $white;
+          width: 34px;
+          height: 28px;
+          text-align: center;
+          padding-top: 3px;
+      }
+
+      & > .name {
+          margin-bottom: 5px;
+          margin-left: 15px;
+          
+          color: $white;
+          &:hover {
+              color: $white;
+          }
+
+          & > [class*=icon-] {
+              font-size: 24px;
+          }
+
+      }
+
+      & > .icon {
+          margin: 5px 15px;
+          width: 32px;
+          height: 32px;
+
+          & > [class*=icon-] {
+              font-size: 32px;
+          }
+
+          & > img {
+              width: 100%;
+              height: 100%;
+          }
+      }
+
+      & > img ~ .text {
+          position: absolute;
+          left: 60px;
+          width: auto;
+      }
+
+      & > .text {
+          position: relative;
+          left: 8px;
+          top: 5px;
+          right: 50px;
+          color: $white;
+          line-height: 14px;
+          width: 60%;
+
+          &:hover {
+              color: $white;
+          }
+      }
+  }
+
+}
+
+.tile-stack::before,
+.tile-stack::after {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  
+  position: absolute;
+  content: '';
+  
+  border: 1px solid darken($grayLighter, 5%);
+  background: $grayLightest;
+  
+  height: 4px;
+}
+.tile-stack::before {
+  width: 196px;
+  
+  left: 1px;
+  bottom: -4px;
+}
+.tile-stack::after {
+  width: 192px;
+  
+  left: 3px;
+  bottom: -7px;
+}

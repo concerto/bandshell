@@ -1,0 +1,70 @@
+/*
+Syntax error: Undefined mixin 'border-radius'.
+        on line 11 of ./public/stylesheets/sass/components/screenmodel.scss, in `border-radius'
+        from line 11 of ./public/stylesheets/sass/components/screenmodel.scss
+
+6:   position: relative;
+7:   padding: 25px 25px 40px 25px;
+8:   background: #000;
+9:   border: solid 2px #a6a6a6;
+10:   border-bottom: solid 20px #a6a6a6;
+11:   @include border-radius(4px);
+12:   @include box-shadow(0px 2px 6px #999);
+13: 
+14:   .inset {
+15:     height: 100%;
+16:     position: relative;
+
+Backtrace:
+./public/stylesheets/sass/components/screenmodel.scss:11:in `border-radius'
+./public/stylesheets/sass/components/screenmodel.scss:11
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:253:in `visit_mixin'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:37:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `map'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:37:in `block in visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:320:in `visit_rule'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:37:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `block in visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `map'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:53:in `visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:109:in `block in visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:121:in `with_environment'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:108:in `visit_children'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:37:in `block in visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:128:in `visit_root'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/base.rb:37:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:100:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/visitors/perform.rb:7:in `visit'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/tree/root_node.rb:20:in `render'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/engine.rb:315:in `_render'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/engine.rb:262:in `render'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin/compiler.rb:362:in `update_stylesheet'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin/compiler.rb:203:in `block in update_stylesheets'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin/compiler.rb:201:in `each'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin/compiler.rb:201:in `update_stylesheets'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin.rb:81:in `update_stylesheets'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin.rb:54:in `check_for_updates'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sass-3.2.13/lib/sass/plugin/rack.rb:51:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/lint.rb:49:in `_call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/lint.rb:37:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/showexceptions.rb:24:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/commonlogger.rb:33:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/sinatra-1.4.4/lib/sinatra/base.rb:217:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/chunked.rb:43:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/content_length.rb:14:in `call'
+/Users/brzaik/.rvm/gems/ruby-1.9.3-p125/gems/rack-1.5.2/lib/rack/handler/webrick.rb:60:in `service'
+/Users/brzaik/.rvm/rubies/ruby-1.9.3-p125/lib/ruby/1.9.1/webrick/httpserver.rb:138:in `service'
+/Users/brzaik/.rvm/rubies/ruby-1.9.3-p125/lib/ruby/1.9.1/webrick/httpserver.rb:94:in `run'
+/Users/brzaik/.rvm/rubies/ruby-1.9.3-p125/lib/ruby/1.9.1/webrick/server.rb:191:in `block in start_thread'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: Undefined mixin 'border-radius'.\A         on line 11 of ./public/stylesheets/sass/components/screenmodel.scss, in `border-radius'\A         from line 11 of ./public/stylesheets/sass/components/screenmodel.scss\A \A 6:   position: relative;\A 7:   padding: 25px 25px 40px 25px;\A 8:   background: #000;\A 9:   border: solid 2px #a6a6a6;\A 10:   border-bottom: solid 20px #a6a6a6;\A 11:   @include border-radius(4px);\A 12:   @include box-shadow(0px 2px 6px #999);\A 13: \A 14:   .inset {\A 15:     height: 100%;\A 16:     position: relative;"; }

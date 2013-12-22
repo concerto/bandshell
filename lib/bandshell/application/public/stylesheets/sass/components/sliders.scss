@@ -1,0 +1,98 @@
+/*##########################################################################*/
+/*  Slider Elements  */
+/*##########################################################################*/
+
+.slider {
+	@include border-radius(5px);
+	background: #E2E2E2 repeat-x 0 0;
+	height: 6px;
+ 	position: relative;
+ 	cursor: pointer;
+ 	border: 1px solid #999;
+ 	width: 250px;
+ 	float: left;
+ 	margin-top: 12px;
+}
+
+.progress {
+ 	height: 9px;
+ 	margin-left: 50px;
+ 	background-color: #C5FF00;
+ 	display: none;
+ 	opacity: 0.6px; 
+}
+
+.handle {
+ 	@extend .button;
+
+	width: 35px;
+ 	top: -10px;
+ 	position: absolute;
+ 	display: block;
+ 	text-align: center;
+ 	font-size: 0.8em;
+ 	font-weight: 700;
+ 	letter-spacing: -0.07em;
+ 	color: #666;
+ 	vertical-align: bottom;
+	padding-left:2px;
+	padding-right:2px;
+ 	padding-top: 3px;
+ 	text-decoration: none !important;
+
+	&:active {
+		padding-top:3px;
+		padding-left:2px;
+		padding-right:2px;
+	}
+
+  &.thin {
+    width: 8px;
+  }
+	
+}
+
+.range {
+ 	@include border-radius(5px);
+	border: 1px inset #ddd;
+ 	float: left;
+ 	font-size: 20px;
+ 	text-align: center;
+ 	width: 50px;
+ 	margin: 0 0 0 15px;
+ 	padding: 3px 0; 
+}
+
+.left {
+ 	float: left;
+ 	font-size: 1em;
+ 	letter-spacing: -0.07em;
+ 	color: #999;
+ 	font-weight: 500;
+ 	width: 85px;
+ 	padding-top: 3px; 
+}
+
+div {
+ 	&.leftseconds {
+   	float: left;
+   	text-align: right;
+    padding-right: 12px;
+   	color: #000;
+   	margin-top: 7px;
+    font-style: italic;
+    font-size: 0.9em;
+	}
+  	
+	&.rightseconds {
+    	float: left;
+      text-align: left;
+    	padding-left: 12px;
+    	color: #000;
+    	margin-top: 7px; 
+      font-style: italic;
+      font-size: 0.9em;
+	} 
+	
+}
+

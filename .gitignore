@@ -1,2 +1,4 @@
 web/server_info
 web/instance_id
+.DS_Store
+.sass-cache/

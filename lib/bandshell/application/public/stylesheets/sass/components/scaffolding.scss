@@ -1,0 +1,75 @@
+/*
+ * Scaffolding.scss
+ * Basic and global styles for generating a grid system, structural layout, and page templates
+ * ------------------------------------------------------------------------------------------- */
+
+
+// STRUCTURAL LAYOUT
+// -----------------
+
+body {
+  @include sans-serif-font(normal,$basefont,$baseline);
+	margin: 0;
+  color: $grayDark;
+}
+
+#main {
+	padding: 15px 1% 15px 1%; 
+}
+
+
+// BASE STYLES
+// -----------
+
+// Links
+a {
+  color: $linkColor;
+  text-decoration: none;
+  line-height: inherit;
+  font-weight: inherit;
+  &:hover {
+    color: $linkColorHover;
+    text-decoration: underline;
+  }
+}
+
+// FLUID GRID:
+@include gridFluid($fluidGridColumnWidth, $fluidGridGutterWidth);
+
+.row-fluid {
+  [class*="span"].collapse-right {
+    margin-right: -$fluidGridGutterWidth;
+  }
+}
+
+
+// Quick floats
+.pull-right {
+  float: right;
+}
+.pull-left {
+  float: left;
+}
+
+// Toggling content
+.hide {
+  display: none;
+}
+.show {
+  display: block;
+}
+
+.default-padding {
+  padding: 12px;
+}
+
+.second-level-padding {
+  padding-left: 24px;
+}
+
+
+
+.with-shadow {
+	@include box-shadow(0 3px 2px $grayLighter);
+}
+

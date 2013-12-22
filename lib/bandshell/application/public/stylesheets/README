@@ -1,0 +1,3 @@
+For generating css from the files in the Sass directory, run this from /public:
+
+sass --watch sass/index-manifest.scss:concerto-styles.css

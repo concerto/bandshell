@@ -1,0 +1,252 @@
+// lists-grid-stacked.scss.erb
+
+
+
+//---------------
+// Gridlist UL
+// This UL aligns 1..n items in a visual grid. Each item is floated left and fills up available space 
+// (20% width apiece). This UL is used extensively on browse content grids of content.
+
+$griditem-width: 240px;
+$griditem-height: 180px;
+
+ul.new-grid {
+  @include clearfix();
+  margin: 0px;
+  padding: 0px;
+
+  li {
+    list-style: none;
+    float: left;
+    margin: 1px;
+    position: relative;
+
+    a {
+      display: block;
+      width: $griditem-width;
+      height: $griditem-height;
+      background: $white;
+
+      &:hover {
+        text-decoration: none;
+
+        .content {
+          background: darken($grayLight, 6%);
+        
+          img { opacity: 1; }
+        }
+
+        .info {
+          opacity: 1;
+        }
+
+      }
+
+      @include transition(all .1s linear);
+    }
+
+    .content {
+      display: block;
+      z-index: 1;
+      background: $grayLight;
+      height: $griditem-height;
+
+      img {
+        max-width: 100%;
+        opacity: 0.8;
+      }
+
+      p {
+        padding: 12px;
+        font-size: 1.6em;
+        line-height: normal;
+      }
+    }
+
+    .info {
+      z-index: 2;
+      background: $black;
+      opacity: 0.5;
+      display: block;
+      color: $white;
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      width: 100%;
+      @include transition(all .1s linear);
+    }
+
+  }
+}
+
+ul.list-grid {
+	margin: 0px;
+	padding: 0px;
+  @include clearfix();
+	
+  > li {
+	  list-style: none;
+    float: left;
+    min-width: 200px;
+    width: 23%;
+    margin: 8px 4px;
+    min-height:88px;
+    display: table;
+
+    .cont {
+      display: table-cell;
+      vertical-align: top;
+      padding: 0px;
+      min-height: 64px;
+      text-decoration:none;
+      
+      &.thumb-icon { width: 64px; }
+
+      // these elements come along for the ride by bringing in gridlist-item mixin:
+      b {
+        color: $black;
+      }
+      
+      .controls {
+        display: block;
+        margin-top: 4px;
+      }
+
+      h1 {
+        font-size: 1.2em;
+        color: #333;
+        background:none;
+        padding: 0px;
+        margin: 0px;
+        font-weight: bold;
+        text-align: center;
+      }
+      
+      p {
+        margin-bottom: 0px;
+      }
+
+
+      
+    }
+    
+    img {
+      @extend .with-shadow;
+      float: left;
+      margin-bottom:6px;
+      margin-right:10px;
+    }
+
+    i {
+      margin-bottom: 6px;
+      margin-right: 10px;
+    }
+
+  }
+
+  // inset-selection gridlists appear inside forms and while they use 
+  // the base styles of list-grid, several attributes are different
+  // these gridlists are used to make a selection of one or more items
+  // within them (hence their usage in forms)
+  &.inset-selection {
+    border-top: none;
+
+    // a common use for inset gridlists is to have each item in the list-grid
+    // be a clickable link - each item appears with a slight rounded 
+    // border and is a fully clickable region
+
+    > li {
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    > li {
+      > a, > div {
+        @include border-radius(4px);
+        display: block;
+        color: $gray;
+        $transition: border linear .1s, background linear .1s;
+        @include transition($transition);
+      }
+
+      > a:hover {
+        background: $concerto-blue-6;
+        text-decoration: none;
+
+        .inp {
+          background: $concerto-blue-4;
+        }
+      }
+    }
+    
+    .inp {
+      float: left;
+      background: $grayLightest;
+      min-height: 46px;
+      padding: 8px 5px;
+      @include border-radius(4px 0px 0px 4px);
+    }
+
+    .cont {
+      border: none;
+      float: left;
+    }
+  }
+
+  // this class can be applied to a list-grid to compress the size of each
+  // list item inside the grid
+  &.small {
+    > li {
+      min-height: 60px;
+
+      .cont {
+        padding: 8px;
+        min-height: 40px;
+      }
+    }
+
+  }
+}
+
+// variant: for span columns that are small enough, override the 
+// width to make it appear flush:
+.row-fluid .span3 ul.list-grid > li, .row-fluid .span2 ul.list-grid > li, .row-fluid .span1 ul.list-grid > li {
+  width: 100%;
+}
+
+
+//---------------
+// Stacked lists UL
+// An alternative to gridlists, this UL simply stacks its list items
+// on top of one another with visual elements. It is often used for 
+// nested lists, such as the feed list on contents#index.
+
+ul.list-stacked {
+  margin-left: 0px;
+
+  > li {
+    border-top: solid 1px $grayLighter;
+    padding: 12px;
+    list-style: none;
+
+    // this is the second level of UL, which represents a nested list
+    // we only recommend one level deep of visual nesting
+    ul {
+      margin-left: 0px;
+
+      > li {
+        padding-left: 25px;
+        background: #efefef;
+      }
+    }
+
+  }
+
+  p {
+    margin:0px;
+  }
+  
+  .indented {
+    padding-left: 20px;
+  }
+}
