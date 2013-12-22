@@ -1,8 +1,3 @@
-<h1>Welcome to Concerto Player</h1>
-<p>
-  You're seeing this because your Concerto player has not yet been configured.
-  We need the URL of your Concerto instance before we can get up and running.
-</p>
 <% unless @errors.nil? %>
   <% @errors.each do |error| %>
     <p style="color:red">
@@ -10,13 +5,21 @@
     </p>
   <% end %>
 <% end %>
+
+<h3 class="center">We need the URL of your Concerto instance before we can get up and running.</h3>
+
 <form method="post">
-  <p>
-    <label for="url">URL</label>
-    <input name="url" type="text" value="<%= @url %>"></input>
-    <input type="submit" value="Here it is!"></input>
-  </p>
+  <fieldset style="padding-left: 20px; padding-top: 0px;">
+    <div class="clearfix">
+      <label for="url">URL</label>
+      <div class="input">
+        <input id="url" name="url" class="input-xxlarge" type="text" value="<%= @url %>" /> <input type="submit" class="btn" value="Here it is!" />
+      </div>
+    </div>
+  </fieldset>
 </form>
+
+<br /><br />
 <p>
   The IPv4 address of this screen appears to be:
   <%= my_ip %>

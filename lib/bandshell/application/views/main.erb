@@ -13,7 +13,43 @@
   <%#= render :partial => "elements/render_flash" %>
 
   <div id="main" class="container-fluid">
-    <%= yield %>
+
+    <section class="viewblock">
+      <header class="viewblock-header light-version">
+        <div class="default-padding" style="padding: 40px 12px; text-align: center;">
+          <h1 style="font-size: 5em; letter-spacing: -0.025em;">Welcome to Concerto Player.</h1>
+          <h3>Your Concerto Player has not yet been configured. Follow these instructions to get up and running fast.</h3>
+        </div>
+      </header>
+
+      <div class="viewblock-cont">
+        <div class="default-padding">
+
+          <div class="row-fluid">
+            <div class="span2">
+              &nbsp;
+            </div>
+            <div class="span8">
+
+              <br />
+              <%= yield %>
+              <br />
+
+            </div>
+            <div class="span2">
+              &nbsp;
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <br />
+    <div class="center">
+      <img src="/images/elements/logomark.png" alt="Concerto Player" width="70" />
+    </div>
+
   </div>
+
 </body>
 </html>

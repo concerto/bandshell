@@ -7,9 +7,8 @@
 
 html {
 	// include background with retina mixin:
-	@include at2x('layout/pagebg', 12px, 12px, '.gif');
-	background-repeat: repeat;
- 	
+	background: url(/images/layout/pagebg.gif) repeat;
+
  	color: #000;
  	font-family: $sans-body;
 	//min-width: 800px;

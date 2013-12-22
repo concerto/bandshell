@@ -17,14 +17,9 @@
 /*  Frame and Resets  */
 /*##########################################################################*/
 html {
-  background-image: image_url("layout/pagebg.gif");
-  background-repeat: repeat;
+  background: url(/images/layout/pagebg.gif) repeat;
   color: #000;
   font-family: "Lucida Grande", Arial, sans-serif; }
-  @media all and (-webkit-min-device-pixel-ratio: 1.5) {
-    html {
-      background-image: image_url("layout/pagebg@2x.gif");
-      background-size: 12px 12px; } }
 
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, textarea, p, blockquote, th, td {
   margin: 0;
