@@ -402,7 +402,7 @@ class ConcertoConfigServer < Sinatra::Base
   # TODO: Refactor player settings management into a separate class
  
   @@player_data_updated=Time.new(0)
-  @@screen_on_off=[{:action=>"on"}] # default to always-on
+  @@screen_on_off=[{"action"=>"on"}] # default to always-on
 
   # Fetches the latest player settings from Concerto if the current
   # settings are too old or an update is forced (force=true).

@@ -14,3 +14,7 @@
 <pre>
   <%= JSON.pretty_generate(@on_off_rules) %>
 </pre>
+<p>
+  Screen status: Scheduled
+  <%= screen_scheduled_on? ? "On" : "Off" %>
+</p>
