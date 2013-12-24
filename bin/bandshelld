@@ -18,6 +18,6 @@ timer_argv = ARGV.dup
 timer_argv << "--" unless timer_argv.include? "--"
 timer_argv << bandshell_url
 
-Daemons.run("bin/bandshell-timer.rb", 
+Daemons.run(File.join(File.dirname(__FILE__), "bandshell-timer.rb"), 
             :log_output=>true, :dir_mode => dir_mode,
             :ARGV => timer_argv)
