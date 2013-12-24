@@ -1,9 +1,8 @@
 PATH
   remote: .
   specs:
-    bandshell (0.0.20)
+    bandshell (0.8)
       daemons
-      haml
       ipaddress
       sinatra
       sys-proctable
@@ -15,8 +14,6 @@ GEM
     backports (3.3.5)
     daemons (1.1.9)
     ffi (1.9.0)
-    haml (4.0.3)
-      tilt
     ipaddress (0.8.0)
     multi_json (1.8.2)
     rack (1.5.2)
