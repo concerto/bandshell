@@ -118,7 +118,12 @@ module Bandshell
 
       data=JSON.parse(response.body)
       if data.has_key? 'screen_temp_token'
-        ConfigStore.write_config('auth_temp_token',data['screen_temp_token'])
+        # We modify the token by appending an "s".
+        # Concerto allows this and concerto-hardware will use it to
+        # recognize that the user is setting up a managed player in
+        # addition to a simple screen.
+        token = data['screen_temp_token'] + 's'
+        ConfigStore.write_config('auth_temp_token',token)
         return true
       end
       return false
