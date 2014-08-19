@@ -14,7 +14,9 @@ module Bandshell
     end
 
     def concerto_url
-      Bandshell::ConfigStore.read_config('concerto_url', '')
+      # Trailing slash required for proper URI Join behavior.
+      # Double slashes not harmful.
+      Bandshell::ConfigStore.read_config('concerto_url', '')+"/"
     end
 
     def frontend_uri
@@ -35,6 +37,13 @@ module Bandshell
 
     attr_reader :screen_id, :screen_url
 
+    # Can return:
+    #   :stat_badauth
+    #   :stat_err
+    # Return values from fetch_screen_data
+    #   :stat_serverr on connection or sever failure
+    #   :stat_badauth on an invalid permanent token
+    #   :stat_success when screen data retrieved.
     def attempt_to_get_screen_data!
       unless have_temp_token? or have_auth_token?
         request_temp_token!
@@ -50,6 +59,8 @@ module Bandshell
           ConfigStore.write_config('auth_token','')
           request_temp_token!
         end
+      elsif have_temp_token?
+        status = :stat_temponly
       else
         status = :stat_err
       end
@@ -66,6 +77,11 @@ module Bandshell
       
     # Get array of data about the screen from the server
     # This can only succeed once we have obtained a valid auth token.
+    # Returns:
+    #   :stat_serverr on connection or sever failure
+    #   :stat_badauth on an invalid permanent token
+    #   :stat_success when screen data retrieved.
+    # TODO: save screen data in configs???
     def fetch_screen_data
       return nil if auth_token.empty?
 

@@ -5,6 +5,7 @@ require 'net/http'
 require 'ipaddress'
 require 'bandshell/netconfig'
 require 'bandshell/hardware_api'
+require 'bandshell/player_info'
 require 'sys/uptime'
 require 'sys/proctable'
 include Sys
@@ -33,6 +34,10 @@ class ConcertoConfigServer < Sinatra::Base
       puts '  installing the sinatra-contrib gem on your system.'   
     end 
     set :no_netconfig, true
+  end
+
+  def player_info
+    @player_info ||= Bandshell::PlayerInfo.new
   end
 
   # push these over to netconfig.rb?
@@ -80,17 +85,21 @@ class ConcertoConfigServer < Sinatra::Base
       end
     end
 
+    def request_is_local?
+      ip = IPAddress.parse(request.env['REMOTE_ADDR'])
+      LOCALHOSTS.include? ip
+    end
+
     # Check authorization credentials.
     # Currently configured to check if the REMOTE_ADDR is local and allow
     # everything if so. This permits someone at local console to configure
     # without the need for a password. Others must have the correct 
     # password to be considered authorized.
     def authorized?
-      ip = IPAddress.parse(request.env['REMOTE_ADDR'])
       password = Bandshell::ConfigStore.read_config(
         'password', 'default'
       )
-      if LOCALHOSTS.include? ip
+      if request_is_local? 
         # allow all requests from localhost no questions asked
         true
       else
@@ -167,32 +176,22 @@ class ConcertoConfigServer < Sinatra::Base
     end
   end
 
-  # The local fullscreen browser will go to /screen.
-  # We should redirect to the screen URL if possible.
-  # Otherwise, we need to go to the setup page to show useful information
-  # and allow for local configuration if needed/wanted.
+  # This action is the entry point for the local, fullscreen browser.
+  # If configuration is needed, we will send the screen to the configuration
+  # view. Otherwise, we will render the "authenticate" view, which will
+  # oversee administration of the temp token (if not already authorized), and
+  # send the browser to the Concerto frontend when everything is authenticated
+  # and ready to go.
   get '/screen' do
     # if we don't have a URL go to setup
     # if we do, check it out
     if concerto_url == ''
       redirect '/setup'
     else
-      # check if the concerto server is reachable, if so redirect there
-      # if not redirect to a local error message screen
-      if validate_url(concerto_url)
-        if Bandshell::HardwareApi.attempt_to_get_screen_data! == :stat_success 
-          # Render the authenticate view which includes js to authenticate
-          # the browser and then redirect to the frontend.
-          @display_temp_token = nil # Disable the other features of the view
-          return erb :authenticate
-        else
-          # Authenticate action will manage the whole authentication process,
-          # picking up wherever we last left off.
-          redirect '/authenticate'
-        end
-      else
-        redirect '/problem'
-      end
+      # authenticate.js will pick up wherever the javascript has left off,
+      # and oversee the authentication of the screen by polling the
+      # authenticate.json view.
+      return erb :authenticate
     end
   end
 
@@ -220,8 +219,13 @@ class ConcertoConfigServer < Sinatra::Base
       # save to the configuration store
       Bandshell::ConfigStore.write_config('concerto_url', url)
 
-      # root will now redirect to the proper concerto_url
-      redirect '/screen'
+      # root will now redirect to the proper concerto_url,
+      # if we are the player and not a remote admin.
+      if request_is_local?
+        redirect '/screen'
+      else
+        erb :setup
+      end
     else
       # the URL was no good, back to setup!
       # error handling flash something something something
@@ -238,25 +242,24 @@ class ConcertoConfigServer < Sinatra::Base
     erb :problem
   end
 
-  get '/authenticate' do
-    # Following call will get a temp token if we need it
-    Bandshell::HardwareApi.attempt_to_get_screen_data!
-
-    # If we don't have a temp token that means we are authenticated
-    # or there was trouble communicating with the server.
-    if Bandshell::HardwareApi.have_temp_token?
-      @display_temp_token = Bandshell::HardwareApi.temp_token
-    end
-    return erb :authenticate
-  end
-
+  # TODO: clean this up.
   get '/authenticate.json' do
     result = {:accepted => 0}
-    if Bandshell::HardwareApi.attempt_to_get_screen_data! == :stat_success
+    stat= Bandshell::HardwareApi.attempt_to_get_screen_data! 
+    if stat == :stat_success
       result[:accepted] = 1
       result[:url] = Bandshell::HardwareApi.screen_url
       result[:user] = "screen"
       result[:pass] = Bandshell::HardwareApi.auth_token
+    elsif stat == :stat_serverr
+      result[:error] = "Unable to communicate with the server."
+      result[:error_res] = "Check the network connection and the server "+
+        "URL ("+Bandshell::HardwareApi.concerto_url+")."
+    elsif stat == :stat_temponly
+      result[:temp_token] = Bandshell::HardwareApi.temp_token
+    else #TODO: there must be other cases, right?
+      result[:error] = "Unknown authentication error!"
+      result[:error_res] = "Please report code "+stat.to_s+"."
     end
     content_type :json
     result.to_json
@@ -391,12 +394,12 @@ class ConcertoConfigServer < Sinatra::Base
   # to execute system maintenance functions such as updating configs
   # from Concerto, and performing screen on/off control.
   get '/background-job' do
-    force = params.has_key? "force"
-    if update_player_info(force)
-      "Update executed"
+    if params.has_key? "force"
+      success = player_info.update
     else
-      "update_player_info failed."
+      success = player_info.update_if_stale
     end
+    "Player Info Update "+(success ? "succeeded" : "failed")+"."
   end
 
   # TODO: Refactor player settings management into a separate class
@@ -404,100 +407,12 @@ class ConcertoConfigServer < Sinatra::Base
   @@player_data_updated=Time.new(0)
   @@screen_on_off=[{"action"=>"on"}] # default to always-on
 
-  # Fetches the latest player settings from Concerto if the current
-  # settings are too old or an update is forced (force=true).
-  # TODO: Store settings in BandshellConfig (and update whenever they have
-  # changed) so that configs are immediately available at boot.
   def update_player_info(force=false)
     # TODO: Configurable update interval
     if force or (@@player_data_updated < Time.now - 60*5)
-      data = Bandshell::HardwareApi::get_player_info
-      if data.nil?
-        puts "update_player_info: Error: Recieved null data from get_player_info!"
-        false
-      else
-        new_rules = parse_screen_on_off(data['screen_on_off'])
-        if new_rules.nil?
-          false
-        else
-          puts "update_player_info: Updating the rules!"
-          @@screen_on_off = new_rules
-          @@player_data_updated = Time.now
-        end
-      end
     else
       true
     end
   end
 
-  # TODO: more validation before accepting.
-  def parse_screen_on_off(data)
-    begin
-      rules = JSON.parse(data)
-      if rules.is_a? Array
-        return rules
-      else
-        puts "parse_screen_on_off: Recieved something other than an aray."
-        return nil
-      end
-    rescue
-      puts "parse_screen_on_off: invalid JSON recieved"
-      return nil
-    end
-  end
-
-  # Returns true if the screen should be turned on right now,
-  # according to the latest data recieved from concerto-hardware.
-  # Assumes @@screen_on_off is either nil or a valid ruleset.
-  # TODO: Evaluate effects of timezones
-  def screen_scheduled_on?
-    return true if @@screen_on_off.nil?
-
-    results = []
-    t = Time.now
-    @@screen_on_off.each do |rule|
-      rule_active = true
-      rule.each do |key, value|
-        case key
-        when "wkday"
-          rule_active = false unless value.include? t.wday.to_s
-        when "time_after"
-          rule_secs = seconds_since_midnight(Time.parse(value))
-          curr_secs = seconds_since_midnight(t)
-          rule_active = false unless curr_secs > rule_secs
-        when "time_before"
-          rule_secs = seconds_since_midnight(Time.parse(value))
-          curr_secs = seconds_since_midnight(t)
-          rule_active = false unless curr_secs < rule_secs 
-        when "date"
-          day = Time.parse(value)
-          rule_active = false unless t.year==day.year and t.yday==day.yday
-        when "action"
-          # Do nothing.
-        else
-          # Do nothing.
-          # Err on the side of being on too long.
-        end # case key
-      end
-      if rule_active and rule.has_key? "action"
-        results << rule["action"]
-      end
-    end # each rule
-    
-    if results.include? "force_on"
-      return true
-    elsif results.include? "off"
-      return false
-    elsif results.include? "on"
-      return true
-    else # All rules failed
-      return false
-    end
-  end #screen_scheduled_on?
-  
-  # For a given time object, gives a numeric representation of the
-  # time of day on the day it represents.
-  def seconds_since_midnight(time)
-    time.sec + (time.min * 60) + (time.hour * 3600)
-  end
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bandshell (0.8)
+    bandshell (0.9)
       daemons
       ipaddress
       sinatra
