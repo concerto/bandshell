@@ -2,6 +2,10 @@ require 'bandshell/config_store'
 require 'net/http'
 require 'json'
 
+# This class can be thought of as a singleton model which retrieves,
+# manipulates, and stores information about the Player received from
+# the Concerto server's concerto-hardware plugin. For example, it
+# keeps track of screen on/off times.
 module Bandshell
   class PlayerInfo
     attr_accessor :last_update
@@ -14,48 +18,41 @@ module Bandshell
       @on_off_rules = [{"action"=>"on"}] # default to always-on
     end
 
+    # Returns false on failure.
     def update_if_stale
-      if (last_update < Time.now - @shelf_life)
+      if (@last_update < Time.now - @shelf_life)
         update
+      else
+        true
       end
     end #update
 
     # Fetches the latest player settings from Concerto
     # TODO: Store settings in BandshellConfig (and update whenever they have
     # changed) so that configs are immediately available at boot.
+    # Returns true on success, false on failure.
     def update
       data = Bandshell::HardwareApi::get_player_info
       if data.nil?
-        puts "update_player_info: Error: Recieved null data from get_player_info!"
-        false
+        puts "update_player_info: Recieved null data from get_player_info!"
+      elsif data == :stat_serverr
+        puts "update_player_info: Server error while retrieving player info."
+      elsif data == :stat_badauth
+        puts "update_player_info: Auth error while retrieving player info."
       else
-        puts data
-        new_rules = parse_screen_on_off(data['screen_on_off'])
-        if new_rules.nil?
-          false
+        new_rules = data['screen_on_off']
+        if new_rules.nil? or !new_rules.is_a? Array
+          puts "update_player_info: Invalid screen on/off rules received."
         else
-          puts "update_player_info: Updating the rules!"
-          on_off_rules = new_rules
-          last_update = Time.now
+          @on_off_rules = new_rules
+          puts @on_off_rules.to_json
+          puts self.on_off_rules.to_json
+          @last_update = Time.now
+          return true
         end
       end
+      return false
     end #update
-
-    # TODO: more validation before accepting.
-    def parse_screen_on_off(data)
-      begin
-        rules = JSON.parse(data)
-        if rules.is_a? Array
-          return rules
-        else
-          puts "parse_screen_on_off: Recieved something other than an aray."
-          return nil
-        end
-      rescue
-        puts "parse_screen_on_off: invalid JSON recieved"
-        return nil
-      end
-    end
 
     # Returns true if the screen should be turned on right now,
     # according to the latest data recieved from concerto-hardware.

@@ -37,7 +37,8 @@ class ConcertoConfigServer < Sinatra::Base
   end
 
   def player_info
-    @player_info ||= Bandshell::PlayerInfo.new
+    # Note: probably not thread-safe.
+    @@player_info ||= Bandshell::PlayerInfo.new
   end
 
   # push these over to netconfig.rb?
@@ -386,7 +387,7 @@ class ConcertoConfigServer < Sinatra::Base
   #Requires ffi, sys-uptime, and sys-proctable gems
   get '/player_status' do
     @proctable = ProcTable.ps
-    @on_off_rules = @@screen_on_off
+    @on_off_rules = player_info.on_off_rules
     erb :player_status
   end  
 
@@ -400,19 +401,6 @@ class ConcertoConfigServer < Sinatra::Base
       success = player_info.update_if_stale
     end
     "Player Info Update "+(success ? "succeeded" : "failed")+"."
-  end
-
-  # TODO: Refactor player settings management into a separate class
- 
-  @@player_data_updated=Time.new(0)
-  @@screen_on_off=[{"action"=>"on"}] # default to always-on
-
-  def update_player_info(force=false)
-    # TODO: Configurable update interval
-    if force or (@@player_data_updated < Time.now - 60*5)
-    else
-      true
-    end
   end
 
 end
