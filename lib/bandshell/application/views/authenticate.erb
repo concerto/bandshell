@@ -3,13 +3,46 @@
 <div id="no-js">
   It looks like Javascript is disabled. The Concerto Display will not work.
 </div>
-<% unless @display_temp_token.nil? %>
-  <div id="instructions">
-    Please enter the following token when setting up the screen in the 
-    Concerto Panel:
-    <%= @display_temp_token %>
-  </div>
-<% end %>
 <div id="status">
   Waiting for first update...
+</div>
+<div id="error" style="display:none">
+  <div class="alert alert-block">
+    <h2><span id="error_text">Error text here.</span></h2>
+    <p><span id="error_res_text">Error resolution info here.</span></p>
+  </div>
+</div>
+<div id="instructions" style="display:none">
+  <div class="alert alert-block">
+    <p class="center">
+    To configure this screen, you will need the following code: 
+    </p>
+    <p class="center" style="font-size: 4em; font-family: Courier New, monospace; line-height: 1em;">
+      <%# The following span will be filled in by javascript. %>
+      <strong><span id="screen_temp_token">xxxxxx</span></strong>
+    </p>
+  </div>
+  <div style="margin: 20px auto; max-width: 850px;">
+    <br />
+    <h2><b>Step One.</b><br />
+      On your PC or mobile device, log into the 
+Concerto Panel and visit the Screens page.
+    </h2>
+    <br />
+    <h2><b>Step Two.</b><br />If this is a completely new screen, click 
+&quot;New Screen&quot; and fill out the relevant details.</h2>
+    The screen should not be public. Use the code 
+given above as the authorization code. If this 
+machine is being reconfigured or is replacing an 
+existing screen, simply click on that screen, click 
+edit, ensure that the screen is not public, and enter 
+the authorization code.
+    <br />
+    <h2><b>Step Three.</b><br />Finally, take a look back at this screen. After a moment, 
+your template should appear.</h2>
+    <p>You can add some content to the screen by editing the 
+subscriptions in each field in the Concerto Panel.</p>
+    <br />
+    <h1 class="center">Happy Advertising!</h1>
+  </div>
 </div>
