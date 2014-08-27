@@ -24,7 +24,8 @@ class ConcertoConfigServer < Sinatra::Base
   set :no_netconfig, false
 
   configure :development do
-    puts 'Bandshell Config Server starting in development mode.'
+    puts 'Bandshell Config Server starting in development mode, port '+
+      settings.port.to_s
     begin
       require "sinatra/reloader"
       register Sinatra::Reloader
