@@ -14,7 +14,7 @@ module Bandshell
 
     def initialize
       @last_update  = Time.new(0)
-      @shelf_life   = 60*5
+      @shelf_life   = 60
       @on_off_rules = [{"action"=>"on"}] # default to always-on
     end
 
@@ -45,8 +45,6 @@ module Bandshell
           puts "update_player_info: Invalid screen on/off rules received."
         else
           @on_off_rules = new_rules
-          puts @on_off_rules.to_json
-          puts self.on_off_rules.to_json
           @last_update = Time.now
           return true
         end

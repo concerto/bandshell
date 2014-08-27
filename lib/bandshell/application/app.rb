@@ -6,6 +6,7 @@ require 'ipaddress'
 require 'bandshell/netconfig'
 require 'bandshell/hardware_api'
 require 'bandshell/player_info'
+require 'bandshell/screen_control'
 require 'sys/uptime'
 require 'sys/proctable'
 include Sys
@@ -402,6 +403,10 @@ class ConcertoConfigServer < Sinatra::Base
       success = player_info.update_if_stale
     end
     "Player Info Update "+(success ? "succeeded" : "failed")+"."
+
+    Bandshell::ScreenControl.enforce_screen_state(
+      :on => player_info.screen_scheduled_on?
+    )
   end
 
 end

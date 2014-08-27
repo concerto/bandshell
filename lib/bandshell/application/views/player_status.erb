@@ -15,6 +15,20 @@
   <%= JSON.pretty_generate(@on_off_rules) %>
 </pre>
 <p>
-  Screen status: Scheduled
+  Screen scheduled state: 
   <%= player_info.screen_scheduled_on? ? "On" : "Off" %>
+</p>
+<p>
+  Screen control availability:
+  <% avail, msg = Bandshell::ScreenControl.control_availability %>
+  <% if avail %>
+    Available
+  <% else %>
+    Not available:<br/>
+    <%= msg %>
+  <% end %>
+</p>
+<p>
+  Screen actual state:
+  <%= Bandshell::ScreenControl.screen_is_on? ? "On" : "Off" %>
 </p>
