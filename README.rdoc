@@ -1,24 +1,21 @@
 = Concerto Bandshell
 
-Bandshell is an optional part of the Concerto[http://www.github.com/concerto/concerto] Digital Signage system (v2). It interfaces with Concerto's API to manage installation and configuration of a screen, and then takes over for local management of firmware and configuration updates, and day-to-day operation of the browser viewer.
+Bandshell is an optional part of the Concerto[https//www.github.com/concerto/concerto] Digital Signage system (v2). It interfaces with the Concerto server to manage installation and configuration of a screen, and then takes over for local management of firmware and configuration updates, and day-to-day operation of the browser viewer.
 
-Bandshell has three main components:
+The core logic of Bandshell resides in a daemon that acts as a local webserver, relying on a series of Ruby classes for interaction with the Concerto server and for management of the screen. This webserver provides the entry page for the local web browser as well as remote control and status pages. A second daemon polls the web server periodically to trigger recurring tasks such as checking the Concerto server for new settings, and applying existing configuration.
 
-* A local daemon that boots with the PC, starts the webserver and browser, and controls firmware updates, configuration updates, and screen on/off commands if available.
-* A local webserver for initial configuration, browser redirection, and status reporting.
-* A command-line utility for convenient access to the same initial configuration and status reporting functions available through the local webserver.
+A prerequisite to using Bandshell is having the {concerto-hardware}[https://www.github.com/concerto/concerto-hardware] plugin installed on the Concerto server. Don't fret, though: it is currently included by default!
 
-== Development Status
+= Installation
 
-===Building Bandshell for development
+The easiest way to get Bandshell is to download the {Concerto Player image}[https://github.com/concerto/concerto-player], a complete operating system for your display computer. It launches Bandshell and a web server to display it out of the box with little to no manual configuration.
 
-* Build the Bandshell gem with "gem build bandshell.gemspec"
-* Run "sudo gem install bandshell-xxx.gem"
-* Run "bandshelld run" to launch the Sinatra daemon and go to http://127.0.0.1:4567
+Advanced installation instructions and development information can be found at the wiki link below.
 
 == Documentation
 
-Further documentation on this software will be stored in the Bandshell wiki on github (link forthcoming). For general Concerto v2 Documentation, see the {Concerto Wiki}[http://github.com/concerto/concerto/wiki]
+Further documentation on Bandshell can be found in the {Bandshell Wiki on github}[https://github.com/concerto/bandshell/wiki].
 
-The public website for Concerto is at http://www.concerto-signage.org.
+For general Concerto v2 Documentation, see the {Concerto Wiki}[https://github.com/concerto/concerto/wiki]. The public website for Concerto is at http://www.concerto-signage.org.
 
+Bandshell is licensed under the Apache License, Version 2.0.
