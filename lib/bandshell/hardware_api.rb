@@ -78,7 +78,7 @@ module Bandshell
     def get_https_response(uri, options={})
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
-        unless options[:user].blank?  && options[:pass].blank?
+        unless options[:user].nil?  && options[:pass].nil?
           request.basic_auth options[:user], options[:pass]
         end
         response = http.request request
