@@ -155,12 +155,16 @@ class ConcertoConfigServer < Sinatra::Base
       begin
         # this will fail with Errno::something if server 
         # can't be reached
-        response = Net::HTTP.get_response(URI(url))
-        if response.code != "200"
+        uri = URI(url)
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          response = http.request request
           # also bomb out if we don't get an OK response
           # maybe demanding 200 is too strict here?
-          fail
-        end
+          if response.code != "200"
+            fail
+          end
+        end        
 
         # if we get here we have a somewhat valid URL to go to
         true
