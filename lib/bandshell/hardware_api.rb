@@ -131,8 +131,6 @@ module Bandshell
 
     def request_temp_token!
       begin
-        response = Net::HTTP.get_response(frontend_api_uri)
-
         uri = URI(frontend_api_uri)
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
           request = Net::HTTP::Get.new uri.request_uri
