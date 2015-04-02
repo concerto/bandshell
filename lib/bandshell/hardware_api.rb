@@ -75,8 +75,7 @@ module Bandshell
       @screen_id =nil
     end
     
-    def get_https_response(query, options={})
-      uri = URI(query)
+    def get_https_response(uri, options={})
       Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         request = Net::HTTP::Get.new uri.request_uri
         unless options[:user].blank?  && options[:pass].blank?
@@ -124,7 +123,7 @@ module Bandshell
 
     def get_with_auth(uri, user, pass)
       begin       
-        response = get_https_response(uri.to_s, {:user => user, :pass => pass})         
+        response = get_https_response(uri, {:user => user, :pass => pass})         
       rescue StandardError => ex
         puts "get_with_auth: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
@@ -135,7 +134,7 @@ module Bandshell
 
     def request_temp_token!
       begin
-        response = get_https_response(URI(frontend_api_uri))
+        response = get_https_response(frontend_api_uri)
         
         if response.code != "200"
           puts "request_temp_token: Unsuccessful request, HTTP "+response.code+"."
@@ -171,7 +170,7 @@ module Bandshell
 
       query = URI.join(frontend_api_uri,"?screen_temp_token="+temp_token)
       begin   
-        response = get_https_response(URI(query))
+        response = get_https_response(query)
 
         if response.code != "200"
           puts "check_temp_token: Unsuccessful request, HTTP "+response.code+"."
