@@ -82,6 +82,7 @@ module Bandshell
           request.basic_auth options[:user], options[:pass]
         end
         response = http.request request
+      end
     end    
       
     # Get array of data about the screen from the server
