@@ -74,6 +74,16 @@ module Bandshell
       @screen_url = nil
       @screen_id =nil
     end
+    
+    def get_https_response(query, options={})
+      uri = URI(query)
+      Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        request = Net::HTTP::Get.new uri.request_uri
+        unless options[:user].blank?  && options[:pass].blank?
+          request.basic_auth options[:user], options[:pass]
+        end
+        response = http.request request
+    end    
       
     # Get array of data about the screen from the server
     # This can only succeed once we have obtained a valid auth token.
@@ -112,48 +122,37 @@ module Bandshell
       end
     end
 
-
     def get_with_auth(uri, user, pass)
       begin       
-        uri = URI(url)
-        res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          request.basic_auth user, pass
-          http.request request
-        end            
+        response = get_https_response(uri.to_s, {:user => user, :pass => pass})         
       rescue StandardError => ex
         puts "get_with_auth: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
-        res = nil
+        response = nil
       end
-      res
+      response
     end
 
     def request_temp_token!
       begin
-        uri = URI(frontend_api_uri)
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          response = http.request request
+        response = get_https_response(URI(frontend_api_uri))
+        
+        if response.code != "200"
+          puts "request_temp_token: Unsuccessful request, HTTP "+response.code+"."
+          return false
+        end
 
-          if response.code != "200"
-            puts "request_temp_token: Unsuccessful request, HTTP "+response.code+"."
-            return false
-          end
-
-          data=JSON.parse(response.body)
-          if data.has_key? 'screen_temp_token'
-            # We modify the token by appending an "s".
-            # Concerto allows this and concerto-hardware will use it to
-            # recognize that the user is setting up a managed player in
-            # addition to a simple screen.
-            token = data['screen_temp_token'] + 's'
-            ConfigStore.write_config('auth_temp_token',token)
-            return true
-          end
-          return false 
-        end     
-     
+        data=JSON.parse(response.body)
+        if data.has_key? 'screen_temp_token'
+          # We modify the token by appending an "s".
+          # Concerto allows this and concerto-hardware will use it to
+          # recognize that the user is setting up a managed player in
+          # addition to a simple screen.
+          token = data['screen_temp_token'] + 's'
+          ConfigStore.write_config('auth_temp_token',token)
+          return true
+        end
+        return false   
       rescue StandardError => ex
         puts "request_temp_token: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
@@ -171,31 +170,26 @@ module Bandshell
       return :stat_err if temp_token.empty? #should not happen
 
       query = URI.join(frontend_api_uri,"?screen_temp_token="+temp_token)
+      begin   
+        response = get_https_response(URI(query))
 
-      begin
-      
-        uri = URI(url)
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          response = http.request query
-          if response.code != "200"
-            puts "check_temp_token: Unsuccessful request, HTTP "+response.code+"."
-            return :stat_serverr
-          end
-          
-          data=JSON.parse(response.body)
-          if data.has_key? 'screen_auth_token'
-            ConfigStore.write_config('auth_token',data['screen_auth_token'])
-            ConfigStore.write_config('auth_temp_token','')
-            return :stat_success
-          elsif data.has_key? 'screen_temp_token'
-            # Indicates the API was accessed successfuly but the temp token
-            # has not been entered yet.
-            return :stat_success
-          end
-          return :stat_err
-              
-        end     
+        if response.code != "200"
+          puts "check_temp_token: Unsuccessful request, HTTP "+response.code+"."
+          return :stat_serverr
+        end
+        
+        data=JSON.parse(response.body)
+        if data.has_key? 'screen_auth_token'
+          ConfigStore.write_config('auth_token',data['screen_auth_token'])
+          ConfigStore.write_config('auth_temp_token','')
+          return :stat_success
+        elsif data.has_key? 'screen_temp_token'
+          # Indicates the API was accessed successfuly but the temp token
+          # has not been entered yet.
+          return :stat_success
+        end
+        return :stat_err
+
       rescue StandardError => ex
         puts "check_temp_token: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
