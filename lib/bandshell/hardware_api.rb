@@ -114,12 +114,13 @@ module Bandshell
 
 
     def get_with_auth(uri, user, pass)
-      begin
-        req = Net::HTTP::Get.new(uri.to_s)
-        req.basic_auth user, pass
-        res = Net::HTTP.start(uri.hostname, uri.port) { |http|
-          http.request(req)
-        }
+      begin       
+        uri = URI(url)
+        res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          request.basic_auth user, pass
+          http.request request
+        end            
       rescue StandardError => ex
         puts "get_with_auth: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
@@ -131,28 +132,35 @@ module Bandshell
     def request_temp_token!
       begin
         response = Net::HTTP.get_response(frontend_api_uri)
+
+        uri = URI(frontend_api_uri)
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          response = http.request request
+
+          if response.code != "200"
+            puts "request_temp_token: Unsuccessful request, HTTP "+response.code+"."
+            return false
+          end
+
+          data=JSON.parse(response.body)
+          if data.has_key? 'screen_temp_token'
+            # We modify the token by appending an "s".
+            # Concerto allows this and concerto-hardware will use it to
+            # recognize that the user is setting up a managed player in
+            # addition to a simple screen.
+            token = data['screen_temp_token'] + 's'
+            ConfigStore.write_config('auth_temp_token',token)
+            return true
+          end
+          return false 
+        end     
+     
       rescue StandardError => ex
         puts "request_temp_token: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
         return false
       end
-
-      if response.code != "200"
-        puts "request_temp_token: Unsuccessful request, HTTP "+response.code+"."
-        return false
-      end
-
-      data=JSON.parse(response.body)
-      if data.has_key? 'screen_temp_token'
-        # We modify the token by appending an "s".
-        # Concerto allows this and concerto-hardware will use it to
-        # recognize that the user is setting up a managed player in
-        # addition to a simple screen.
-        token = data['screen_temp_token'] + 's'
-        ConfigStore.write_config('auth_temp_token',token)
-        return true
-      end
-      return false
     end
 
     # If the temp token has been accepted, convert it into an auth token,
@@ -167,29 +175,34 @@ module Bandshell
       query = URI.join(frontend_api_uri,"?screen_temp_token="+temp_token)
 
       begin
-        response = Net::HTTP.get_response(query)
+      
+        uri = URI(url)
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+          request = Net::HTTP::Get.new uri.request_uri
+          response = http.request query
+          if response.code != "200"
+            puts "check_temp_token: Unsuccessful request, HTTP "+response.code+"."
+            return :stat_serverr
+          end
+          
+          data=JSON.parse(response.body)
+          if data.has_key? 'screen_auth_token'
+            ConfigStore.write_config('auth_token',data['screen_auth_token'])
+            ConfigStore.write_config('auth_temp_token','')
+            return :stat_success
+          elsif data.has_key? 'screen_temp_token'
+            # Indicates the API was accessed successfuly but the temp token
+            # has not been entered yet.
+            return :stat_success
+          end
+          return :stat_err
+              
+        end     
       rescue StandardError => ex
         puts "check_temp_token: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
         return :stat_serverr
-      end
-
-      if response.code != "200"
-        puts "check_temp_token: Unsuccessful request, HTTP "+response.code+"."
-        return :stat_serverr
-      end
-
-      data=JSON.parse(response.body)
-      if data.has_key? 'screen_auth_token'
-        ConfigStore.write_config('auth_token',data['screen_auth_token'])
-        ConfigStore.write_config('auth_temp_token','')
-        return :stat_success
-      elsif data.has_key? 'screen_temp_token'
-        # Indicates the API was accessed successfuly but the temp token
-        # has not been entered yet.
-        return :stat_success
-      end
-      return :stat_err
+      end     
     end
 
     public
