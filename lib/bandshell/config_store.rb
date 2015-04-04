@@ -24,6 +24,14 @@ module Bandshell
         default
       end
     end
+    
+    #check if a config exists
+    def self.config_exists?(name)
+      initialize_path if not @@path
+      file = File.join(@@path, name)
+      rofile = File.join(@@ropath, name)
+      File.exist?(file) || File.exist?(rofile)
+    end    
 
     # Write a config to the read/write configuration location.
     def self.write_config(name, value)

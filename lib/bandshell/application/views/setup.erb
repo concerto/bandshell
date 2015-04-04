@@ -15,7 +15,11 @@
 </div>
 
 <div class="default-padding">
-  <h3>We need the URL of your Concerto instance before we can get up and running.</h3>
+  <% if @url.empty? %>
+    <h3>We need the URL of your Concerto instance before we can get up and running.</h3>
+  <% else %>
+    <h3>Current Concerto Server Address: <a href="<%=@url%>"><%= @url%></a></h3>
+  <% end %>
   <br />
 
   <form method="post">
@@ -40,14 +44,16 @@
           <td><p>IP Address:</p></td>
           <td><p><b class="pronounced"><%= my_ip %></b></p></td>
         </tr>
-        <tr>
-          <td><p>Default Username:</p></td>
-          <td><p><b class="pronounced">root</b></p></td>
-        </tr>
-        <tr>
-          <td><p>Default Password:</p></td>
-          <td><p><b class="pronounced">default</b></p></td>
-        </tr>
+        <% unless Bandshell::ConfigStore.config_exists?('password')%>
+          <tr>
+            <td><p>Default Username:</p></td>
+            <td><p><b class="pronounced">root</b></p></td>
+          </tr>
+          <tr>
+            <td><p>Default Password:</p></td>
+            <td><p><b class="pronounced">default</b></p></td>
+          </tr>
+        <% end %>
         <tr>
           <td><p>Access this page with URL:</p></td>
           <td><p><b class="pronounced"><a href="http://<%= my_ip %>:<%= my_port %>/setup">http://<%= my_ip %>:<%= my_port %>/setup</a></b></p></td>
