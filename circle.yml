@@ -1,3 +1,7 @@
+dependencies:
+  pre:
+    - gem install package_cloud
+
 test:
   pre:
     - gem build bandshell.gemspec
@@ -5,3 +9,9 @@ test:
     - sudo gem install bandshell-*.gem
   post:
     - cp bandshell-*.gem $CIRCLE_ARTIFACTS
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - package_cloud push kenley/concerto-test $CIRCLE_ARTIFACTS/bandshell-*.gem
