@@ -1,0 +1,7 @@
+test:
+  pre:
+    - gem build bandshell.gemspec
+  override:
+    - sudo gem install bandshell-*.gem
+  post:
+    - cp bandshell-*.gem $CIRCLE_ARTIFACTS
