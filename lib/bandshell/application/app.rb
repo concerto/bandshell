@@ -164,7 +164,7 @@ class ConcertoConfigServer < Sinatra::Base
         false, "An SSL error occurred: #{ex}"
       rescue => ex
         # our request bombed out for some reason
-        false, "URL is not valid: #{ex}"
+        false, "Failed to set URL: Could not connect to Concerto Server."
       end
     end
   end
