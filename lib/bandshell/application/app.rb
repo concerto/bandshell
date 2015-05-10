@@ -153,24 +153,18 @@ class ConcertoConfigServer < Sinatra::Base
     # Check if we can retrieve a URL and get a 200 status code.
     def validate_url(url)
       begin
-        # this will fail with Errno::something if server 
-        # can't be reached
-        uri = URI(url)
-        Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-          request = Net::HTTP::Get.new uri.request_uri
-          response = http.request request
-          # also bomb out if we don't get an OK response
-          # maybe demanding 200 is too strict here?
-          if response.code != "200"
-            fail
-          end
-        end        
+        response = Bandshell::HardwareApi::get_https_response(url)
 
+        if response.code != "200"
+          false, "Did not receive 200 response code"
+        end
         # if we get here we have a somewhat valid URL to go to
         true
-      rescue
+      rescue OpenSSL::SSL::SSLError => ex
+        false, "An SSL error occurred: #{ex}"
+      rescue => ex
         # our request bombed out for some reason
-        false
+        false, "Failed to set URL: Could not connect to Concerto Server."
       end
     end
   end
@@ -222,7 +216,8 @@ class ConcertoConfigServer < Sinatra::Base
   post '/setup' do
     protected!
     url = params[:url]
-    if validate_url(url)
+    valid,error = validate_url(url)
+    if valid
       # save to the configuration store
       Bandshell::ConfigStore.write_config('concerto_url', url)
 
@@ -237,7 +232,7 @@ class ConcertoConfigServer < Sinatra::Base
       # the URL was no good, back to setup!
       # error handling flash something something something
       @errors = []
-      @errors << 'Failed to set URL: Could not connect to Concerto Server.'
+      @errors << error
       @url = url
       erb :setup
     end

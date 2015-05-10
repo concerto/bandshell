@@ -123,8 +123,12 @@ module Bandshell
     end
 
     def get_with_auth(uri, user, pass)
-      begin       
-        response = get_https_response(uri, {:user => user, :pass => pass})         
+      begin
+        response = get_https_response(uri, {:user => user, :pass => pass})
+      rescue OpenSSL::SSL::SSLError => ex
+        puts "get_with_auth: SSL server connection failed:\n"+
+             "   "+ex.message.chomp
+        response = nil
       rescue StandardError => ex
         puts "get_with_auth: Failed to access concerto server:\n"+
              "   "+ex.message.chomp
