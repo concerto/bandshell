@@ -11,14 +11,14 @@ module Bandshell
         system_password = Bandshell::ConfigStore.read_config('system_password', '')
         unless system_password.empty?
           IO.popen("chpasswd", mode='r+') do |io|
-            io.write "root:#{system_password}"
-            io.write "concerto:#{system_password}"
+            io.puts "root:#{system_password}"
+            io.puts "concerto:#{system_password}"
+            io.close_write
             result = io.read
-            if result == 0
+            if result
               Bandshell::ConfigStore.delete_config('system_password')
               Bandshell::ConfigStore.write_config('system_passwords_changed', 'true')
             end
-            io.close_write
           end
         end
       end
