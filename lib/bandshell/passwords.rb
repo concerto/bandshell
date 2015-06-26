@@ -4,7 +4,7 @@ require 'bandshell/config_store'
 
 module Bandshell
   module Passwords
-    def set_local_passwords
+    def self.set_local_passwords
       #if the password has not been changed before during initial setup,
       #read a new one and change passwords accordingly
       unless Bandshell::ConfigStore.config_exists?('system_passwords_changed')
@@ -23,4 +23,5 @@ module Bandshell
         end
       end
     end
+  end
 end
