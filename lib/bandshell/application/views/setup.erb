@@ -1,11 +1,3 @@
-<% unless @errors.nil? %>
-  <% @errors.each do |error| %>
-    <p style="color:red">
-      <%= error %>
-    </p>
-  <% end %>
-<% end %>
-
 <%= erb(:navbar, :layout => false) %>
 
 <div class="default-padding">

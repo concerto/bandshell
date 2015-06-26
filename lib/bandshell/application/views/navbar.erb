@@ -1,3 +1,11 @@
+<% unless @errors.nil? %>
+  <% @errors.each do |error| %>
+    <p style="color:red">
+      <%= error %>
+    </p>
+  <% end %>
+<% end %>
+
 <div class="clearfix">
   <ul class="nav nav-tabs">
     <li class=<%= "active" if active_page?("setup") %>>

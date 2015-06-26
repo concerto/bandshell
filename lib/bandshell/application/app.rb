@@ -397,6 +397,8 @@ class ConcertoConfigServer < Sinatra::Base
   get '/system_password' do
     protected!
     if Bandshell::ConfigStore.config_exists?('system_passwords_changed')
+      @errors = []
+      @errors << 'The system password has already been set. Please log in via SSH and use the passwd command to change it again.'
       redirect '/setup'
     end
     erb :system_password
@@ -405,7 +407,8 @@ class ConcertoConfigServer < Sinatra::Base
   post '/system_password' do
     protected!
     if params[:system_password] != params[:system_password_confirm]
-      #write flash notice
+      @errors = []
+      @errors << 'Please make sure the passwords entered are the same.'
       redirect '/system_password'
     end
     Bandshell::ConfigStore.write_config('system_password', params[:system_password])
