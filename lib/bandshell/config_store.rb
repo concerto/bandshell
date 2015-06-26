@@ -8,7 +8,7 @@ module Bandshell
     @@path = nil
 
     def self.read_config(name, default='')
-      initialize_path if not @@path      
+      initialize_path if not @@path
       file = File.join(@@path, name)
       rofile = File.join(@@ropath, name)
 
@@ -24,14 +24,14 @@ module Bandshell
         default
       end
     end
-    
+
     #check if a config exists
     def self.config_exists?(name)
       initialize_path if not @@path
       file = File.join(@@path, name)
       rofile = File.join(@@ropath, name)
       File.exist?(file) || File.exist?(rofile)
-    end    
+    end
 
     # Write a config to the read/write configuration location.
     def self.write_config(name, value)
@@ -41,6 +41,13 @@ module Bandshell
       File.open(file, 'w') do |f|
         f.write value
       end
+    end
+
+    # Delete a config from the filesystem
+    def self.delete_config(name)
+      initialize_path if not @@path
+      file = File.join(@@path, name)
+      FileUtils.rm(file)
     end
 
     def self.initialize_path

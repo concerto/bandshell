@@ -5,6 +5,17 @@
 require "rubygems"
 require "daemons"
 require "bandshell/application/app"
+require 'bandshell/config_store'
+
+unless Bandshell::ConfigStore.config_exists?('system_passwords_changed')
+  system_password = Bandshell::ConfigStore.read_config('system_password', '')
+  unless system_password.empty?
+    system("echo \"root:#{system_password}\" | chpasswd")
+    system("echo \"concerto:#{system_password}\" | chpasswd")
+    Bandshell::ConfigStore.delete_config('system_password')
+    Bandshell::ConfigStore.write_config('system_passwords_changed', 'true')
+  end
+end
 
 dir_mode = (ConcertoConfigServer.development? ? :normal : :system)
 
@@ -18,6 +29,6 @@ timer_argv = ARGV.dup
 timer_argv << "--" unless timer_argv.include? "--"
 timer_argv << bandshell_url
 
-Daemons.run(File.join(File.dirname(__FILE__), "bandshell-timer.rb"), 
+Daemons.run(File.join(File.dirname(__FILE__), "bandshell-timer.rb"),
             :log_output=>true, :dir_mode => dir_mode,
             :ARGV => timer_argv)

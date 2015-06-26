@@ -20,7 +20,7 @@ class ConcertoConfigServer < Sinatra::Base
 
   # listen on all IPv4 and IPv6 interfaces
   set :bind, '::'
-  
+
   # Provide an option to skip network settings when developing
   set :no_netconfig, false
 
@@ -33,9 +33,13 @@ class ConcertoConfigServer < Sinatra::Base
     rescue LoadError
       puts '  Reloading is not enabled, however.'
       puts '  You can enable limited app.rb reloading in development by'
-      puts '  installing the sinatra-contrib gem on your system.'   
-    end 
+      puts '  installing the sinatra-contrib gem on your system.'
+    end
     set :no_netconfig, true
+  end
+
+  def active_page?(path='')
+    request.path_info == '/' + path
   end
 
   def player_info
@@ -45,19 +49,19 @@ class ConcertoConfigServer < Sinatra::Base
 
   # push these over to netconfig.rb?
   # Our list of available physical-layer connection methods...
-  CONNECTION_METHODS = [ 
-    Bandshell::WiredConnection, 
-    Bandshell::WirelessConnection 
+  CONNECTION_METHODS = [
+    Bandshell::WiredConnection,
+    Bandshell::WirelessConnection
   ]
   # ... and available layer-3 addressing methods.
-  ADDRESSING_METHODS = [ 
-    Bandshell::DHCPAddressing, 
-    Bandshell::StaticAddressing 
+  ADDRESSING_METHODS = [
+    Bandshell::DHCPAddressing,
+    Bandshell::StaticAddressing
   ]
 
   # Hosts we allow to access configuration without authenticating.
-  LOCALHOSTS = [ 
-    IPAddress.parse("127.0.0.1"),    # ipv4 
+  LOCALHOSTS = [
+    IPAddress.parse("127.0.0.1"),    # ipv4
     IPAddress.parse("::ffff:127.0.0.1"),  # ipv6-mapped ipv4
     IPAddress.parse("::1")      # ipv6
   ]
@@ -78,7 +82,7 @@ class ConcertoConfigServer < Sinatra::Base
     end
 
     # Enforce authentication on actions.
-    # Calling from within an action will check authentication and return 
+    # Calling from within an action will check authentication and return
     # 401 if unauthorized.
     def protected!
       unless authorized?
@@ -96,13 +100,13 @@ class ConcertoConfigServer < Sinatra::Base
     # Check authorization credentials.
     # Currently configured to check if the REMOTE_ADDR is local and allow
     # everything if so. This permits someone at local console to configure
-    # without the need for a password. Others must have the correct 
+    # without the need for a password. Others must have the correct
     # password to be considered authorized.
     def authorized?
       password = Bandshell::ConfigStore.read_config(
         'password', 'default'
       )
-      if request_is_local? 
+      if request_is_local?
         # allow all requests from localhost no questions asked
         true
       else
@@ -128,7 +132,7 @@ class ConcertoConfigServer < Sinatra::Base
       end
     end
 
-    # Try to figure out what our current port is 
+    # Try to figure out what our current port is
     # and return it as a string.
     def my_port
       settings.port
@@ -153,7 +157,7 @@ class ConcertoConfigServer < Sinatra::Base
     # Check if we can retrieve a URL and get a 200 status code.
     def validate_url(url)
       begin
-        # this will fail with Errno::something if server 
+        # this will fail with Errno::something if server
         # can't be reached
         uri = URI(url)
         Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
@@ -164,7 +168,7 @@ class ConcertoConfigServer < Sinatra::Base
           if response.code != "200"
             fail
           end
-        end        
+        end
 
         # if we get here we have a somewhat valid URL to go to
         true
@@ -206,13 +210,13 @@ class ConcertoConfigServer < Sinatra::Base
   get '/setup' do
     protected!
     if network_ok
-      # Everything's up and running, we just don't know what 
+      # Everything's up and running, we just don't know what
       # our URL should be.
       @url=Bandshell::ConfigStore.read_config('concerto_url')
       erb :setup
     else
       # The network settings are not sane, we don't have an IP.
-      # Redirect the user to the network configuration page to 
+      # Redirect the user to the network configuration page to
       # take care of this.
       redirect '/netconfig'
     end
@@ -252,7 +256,7 @@ class ConcertoConfigServer < Sinatra::Base
   # TODO: clean this up.
   get '/authenticate.json' do
     result = {:accepted => 0}
-    stat= Bandshell::HardwareApi.attempt_to_get_screen_data! 
+    stat= Bandshell::HardwareApi.attempt_to_get_screen_data!
     if stat == :stat_success
       result[:accepted] = 1
       result[:url] = Bandshell::HardwareApi.screen_url
@@ -287,11 +291,11 @@ class ConcertoConfigServer < Sinatra::Base
       am = nil
     end
 
-    # view will grab what it can from our existing 
+    # view will grab what it can from our existing
     # connection/addressing methods using value_from().
-    erb :netsettings, :locals => { 
-        :connection_method => cm, 
-        :addressing_method => am 
+    erb :netsettings, :locals => {
+        :connection_method => cm,
+        :addressing_method => am
       }
   end
 
@@ -303,7 +307,7 @@ class ConcertoConfigServer < Sinatra::Base
 
   # Extract arguments from a set of form data that are intended to go to a
   # specific network configuration class. These fields have names of the form
-  # 'ClassName/field_name'; this function returns a hash in the form 
+  # 'ClassName/field_name'; this function returns a hash in the form
   # { 'field_name' => 'value } containing the configuration arguments.
   def extract_class_args(params, target_class)
     result = { }
@@ -318,7 +322,7 @@ class ConcertoConfigServer < Sinatra::Base
   end
 
   # Set the arguments on an instance of a given configuration class.
-  # This uses the safe_assign method that should be present in all 
+  # This uses the safe_assign method that should be present in all
   # configuration classes to determine which values are allowed to be passed
   # via form fields (i.e. which ones are subject to validation)
   def do_assign(params, instance)
@@ -338,14 +342,14 @@ class ConcertoConfigServer < Sinatra::Base
     # First we find the connection-method and addressing-method classes.
     cmclass = pick_class(params[:connection_type], CONNECTION_METHODS)
     fail "Connection method not supported" if cmclass.nil?
-    
+
     amclass = pick_class(params[:addressing_type], ADDRESSING_METHODS)
     fail "Addressing method not supported" if amclass.nil?
 
     # ... and create some instances of them.
     cm = cmclass.new
     am = amclass.new
-    
+
     # Now given the names of the specific classes the user has chosen,
     # extract the corresponding form fields.
     cmargs = extract_class_args(params, cmclass.basename)
@@ -372,30 +376,47 @@ class ConcertoConfigServer < Sinatra::Base
     redirect '/netconfig' # as a get request
   end
 
-  get '/password' do
+  get '/config_password' do
     protected!
-    erb :password
+    erb :config_password
   end
 
-  post '/password' do
+  post '/config_password' do
     protected!
-    
+
     if params[:newpass] != params[:newpass_confirm]
-      # something something error handling something
-      redirect '/password'
+      #write flash notice
+      redirect '/config_password'
     end
-    
     Bandshell::ConfigStore.write_config('password', params[:newpass])
     redirect '/setup'
   end
-  
+
+  get '/system_password' do
+    protected!
+    if Bandshell::ConfigStore.config_exists?('system_passwords_changed')
+      redirect '/setup'
+    end
+    erb :system_password
+  end
+
+  post '/system_password' do
+    protected!
+    if params[:system_password] != params[:system_password_confirm]
+      #write flash notice
+      redirect '/system_password'
+    end
+    Bandshell::ConfigStore.write_config('system_password', params[:system_password])
+    redirect '/setup'
+  end
+
   #Shows uptime,firmware version, and general system and process information
   #Requires ffi, sys-uptime, and sys-proctable gems
   get '/player_status' do
     @proctable = ProcTable.ps
     @on_off_rules = player_info.on_off_rules
     erb :player_status
-  end  
+  end
 
   # Should be fetched at a regular interval by the background job
   # to execute system maintenance functions such as updating configs

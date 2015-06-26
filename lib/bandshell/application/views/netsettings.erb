@@ -1,19 +1,13 @@
 <script src="/javascripts/network.js"></script>
 
-<div class="clearfix">
-  <ul class="nav nav-tabs">
-    <li><a href="/setup">Basic Setup</a></li>
-    <li class="active"><a href="/netconfig">Network Settings</a></li>
-    <li><a href="/password">Configuration Password</a></li>
-  </ul>
-</div>
+<%= erb(:navbar, :layout => false) %>
 
 <div>
 
   <form method="post">
     <fieldset>
       <legend><span>Connection Type</span></legend>
-      
+
       <div class="clearfix">
         <select id="connection_type" name="connection_type">
           <!--  list out our available connection methods as options set the html selected flag on the one that is currently selected in the config -->
@@ -21,13 +15,13 @@
             <option <%= cm==connection_method.class ? 'selected' : '' %> value="<%= cm.basename %>">
               <%= cm.description %>
             </option>
-          <% end %> 
+          <% end %>
         </select>
       </div>
 
       <div id="connection">
         <div id="WiredConnection" class="clearfix">
-          
+
           <div class="clearfix">
             <label for="WiredConnection_interface_name">Interface Name</label>
             <div class="input">
@@ -66,7 +60,7 @@
 
             </div>
             <div class="span6">
-              
+
               <div class="clearfix">
                 <label for="WirelessConnection_ssid">SSID</label>
                 <div class="input">
@@ -99,7 +93,7 @@
         <div id="StaticAddressing" class="clearfix">
           <div class="row-fluid">
             <div class="span6">
-              
+
               <div class="clearfix">
                 <label for="StaticAddressing_address">Address</label>
                 <div class="input">
@@ -116,7 +110,7 @@
 
             </div><!-- end .span6 -->
             <div class="span6">
-              
+
               <div class="clearfix">
                 <label for="StaticAddressing_gateway">Gateway</label>
                 <div class="input">

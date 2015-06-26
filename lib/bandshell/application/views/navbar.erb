@@ -1,0 +1,20 @@
+<div class="clearfix">
+  <ul class="nav nav-tabs">
+    <li class=<%= "active" if active_page?("setup") %>>
+      <a href="/setup">Basic Setup</a>
+    </li>
+
+    <li class=<%= "active" if active_page?("netconfig") %>>
+      <a href="/netconfig">Network Settings</a>
+    </li>
+
+    <li class=<%= "active" if active_page?("config_password") %>>
+      <a href="/config_password">Configuration Password</a>
+    </li>
+    <% unless Bandshell::ConfigStore.config_exists?('system_passwords_changed') %>
+      <li class=<%= "active" if active_page?("system_password") %>>
+        <a href="/system_password">System Passwords</a>
+      </li>
+    <% end %>
+  </ul>
+</div>
