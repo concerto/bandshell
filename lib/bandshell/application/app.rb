@@ -180,7 +180,9 @@ class ConcertoConfigServer < Sinatra::Base
   end
 
   get '/' do
-    if concerto_url == ''
+    if !Bandshell::ConfigStore.config_exists?('system_passwords_changed')
+      redirect '/system_password'
+    elsif concerto_url == ''
       redirect '/setup'
     else
       redirect '/player_status'

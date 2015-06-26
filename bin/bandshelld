@@ -7,6 +7,8 @@ require "daemons"
 require "bandshell/application/app"
 require 'bandshell/config_store'
 
+#if the password has not been changed before during initial setup,
+#read a new one and change passwords accordingly
 unless Bandshell::ConfigStore.config_exists?('system_passwords_changed')
   system_password = Bandshell::ConfigStore.read_config('system_password', '')
   unless system_password.empty?
