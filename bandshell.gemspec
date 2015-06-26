@@ -14,5 +14,5 @@ Gem::Specification.new do |s|
   s.add_dependency "ipaddress"
   s.add_dependency "daemons"
   s.files = FileList[ 'lib/**/*', 'bin/*' ].to_a
-  s.executables = ['concerto_netsetup', 'bandshelld']
+  s.executables = ['bandshelld_boot', 'bandshelld']
 end
