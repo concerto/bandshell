@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bandshell/netconfig'
+require 'bandshell/passwords'
 
 Bandshell::configure_system_network
+Bandshell::Passwords.set_local_passwords

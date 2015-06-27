@@ -28,7 +28,7 @@ loop do
   #if a system password is stored as a config, we need to restart bandshelld
   #to execute chpasswd and clear that config
   if Bandshell::ConfigStore.config_exists?('system_password')
-    system("bandshelld restart")
+    Bandshell::Passwords.set_local_passwords
   end
 
   begin
