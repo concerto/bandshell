@@ -13,12 +13,13 @@ module Bandshell
           IO.popen("chpasswd", mode='r+') do |io|
             io.puts "root:#{system_password}"
             io.puts "concerto:#{system_password}"
-            io.close_write
-            result = io.read
-            if result
-              Bandshell::ConfigStore.delete_config('system_password')
-              Bandshell::ConfigStore.write_config('system_passwords_changed', 'true')
-            end
+          end
+
+          if $? == 0 
+            Bandshell::ConfigStore.delete_config('system_password')
+            Bandshell::ConfigStore.write_config('system_passwords_changed', 'true')
+          else
+            # chpasswd returned nonzero status... do something to indicate error
           end
         end
       end
