@@ -386,9 +386,10 @@ class ConcertoConfigServer < Sinatra::Base
   post '/config_password' do
     protected!
 
+    @errors = []
     if params[:newpass] != params[:newpass_confirm]
-      #write flash notice
-      redirect '/config_password'
+      @errors << 'Please make sure the passwords entered are the same.'
+      erb :config_password
     end
     Bandshell::ConfigStore.write_config('password', params[:newpass])
     redirect '/setup'
