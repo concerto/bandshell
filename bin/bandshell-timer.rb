@@ -6,6 +6,7 @@
 # may be performed. Called by bandshelld as a daemon.
 require "net/http"
 require 'bandshell/config_store'
+require 'bandshell/passwords'
 
 def linestamp
   "bandshell-timer.rb ("+Time.now.to_s+"): "
