@@ -1,3 +1,4 @@
+<h1>System Information</h1>
 <p>System Uptime: <%= Uptime.uptime %></p>
 <p>System Processes:</p>
 <ul>
@@ -10,10 +11,22 @@
     </li>
   <% end %>
 </ul>
+
+<h1>Player Configuration</h1>
+<p>
+Screen Name:
+  <%= player_info.screen_name %>
+</p>
+
+<h1>Display Status</h1>
 <p>Screen on/off rules:</p>
 <pre>
   <%= JSON.pretty_generate(@on_off_rules) %>
 </pre>
+<p>
+  Time Zone:
+  <%= player_info.timezone.nil? ? "Not set" : player_info.timezone %>
+</p>
 <p>
   Screen scheduled state: 
   <%= player_info.screen_scheduled_on? ? "On" : "Off" %>

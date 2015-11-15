@@ -1,6 +1,7 @@
 require 'bandshell/config_store'
 require 'net/http'
 require 'json'
+require 'tzinfo'
 
 # This class can be thought of as a singleton model which retrieves,
 # manipulates, and stores information about the Player received from
@@ -11,6 +12,8 @@ module Bandshell
     attr_accessor :last_update
     attr_accessor :on_off_rules
     attr_accessor :shelf_life
+    attr_accessor :screen_name
+    attr_accessor :timezone   # String representation of TZ Location
 
     def initialize
       @last_update  = Time.new(0)
@@ -40,6 +43,18 @@ module Bandshell
       elsif data == :stat_badauth
         puts "update_player_info: Auth error while retrieving player info."
       else
+        unless data['screen'].nil? or data['screen']['name'].nil?
+          @screen_name = data['screen']['name']
+        end
+        tz_string = data['time_zone']
+        unless tz_string.nil? or tz_string.empty?
+          begin
+            new_tz = TZInfo::Timezone.get(tz_string)
+            @timezone = tz_string
+          rescue TZInfo::InvalidTimezoneIdentifier => e
+            puts "update_player_info: Invalid timezone received."
+          end
+        end # TZ identifier present
         new_rules = data['screen_on_off']
         if new_rules.nil? or !new_rules.is_a? Array
           puts "update_player_info: Invalid screen on/off rules received."
@@ -55,12 +70,18 @@ module Bandshell
     # Returns true if the screen should be turned on right now,
     # according to the latest data recieved from concerto-hardware.
     # Assumes on_off_rules is either nil or a valid ruleset.
-    # TODO: Evaluate effects of timezones
     def screen_scheduled_on?
       return true if on_off_rules.nil?
-
       results = []
-      t = Time.now
+
+      begin
+        tz = TZInfo::Timezone.get(timezone) unless timezone.nil?
+      rescue TZInfo::InvalidTimezoneIdentifier => e
+        puts('screen_scheduled_on?: Invalid Time Zone. Defaulting to NY.')
+      end
+      tz = TZInfo::Timezone.get('America/New_York') if tz.nil?
+
+      t = tz.now
       on_off_rules.each do |rule|
         rule_active = true
         rule.each do |key, value|
