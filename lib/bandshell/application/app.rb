@@ -27,6 +27,7 @@ class ConcertoConfigServer < Sinatra::Base
   configure :development do
     puts 'Bandshell Config Server starting in development mode, port '+
       settings.port.to_s
+    enable :logging, :dump_errors, :raise_errors
     begin
       require "sinatra/reloader"
       register Sinatra::Reloader
@@ -36,6 +37,7 @@ class ConcertoConfigServer < Sinatra::Base
       puts '  installing the sinatra-contrib gem on your system.'
     end
     set :no_netconfig, true
+    set :show_exceptions, true
   end
 
   def active_page?(path='')

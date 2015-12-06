@@ -1,7 +1,27 @@
+<%= erb(:navbar, :layout => false) %>
+
+<script type="text/javascript">
+  togglespeed=0;
+  function toggleProcs() {
+    if ($("#proclist").is(":visible")) {
+      $("#proclist").hide(togglespeed);
+      $("#procexpand").text("expand");
+    } else {
+      $("#proclist").show(togglespeed);
+      $("#procexpand").text("hide");
+    }
+    togglespeed=700; //after the first time
+  }
+  $().ready(toggleProcs); //start hidden
+</script>
+
 <h1>System Information</h1>
 <p>System Uptime: <%= Uptime.uptime %></p>
-<p>System Processes:</p>
-<ul>
+<p>
+  System Processes: <%= @proctable.count %>
+  (<a id="procexpand" href="#" onclick="toggleProcs(700)">expand</a>)
+</p>
+<ul id="proclist">
   <% for p in @proctable %>
     <li>
       <b>
