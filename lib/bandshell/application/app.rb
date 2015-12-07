@@ -239,6 +239,7 @@ class ConcertoConfigServer < Sinatra::Base
       if request_is_local?
         redirect '/screen'
       else
+        @url = Bandshell::ConfigStore.read_config('concerto_url')
         erb :setup
       end
     else
