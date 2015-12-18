@@ -38,5 +38,9 @@ loop do
     puts linestamp + "Bandshell is not responding."
   rescue SocketError
     puts linestamp + "Could not connect to given URL."
+  rescue => e
+    puts linestamp + "Unknown error occurred."
+    puts e.inspect
+    puts e.backtrace
   end
 end
