@@ -62,11 +62,15 @@ class ConcertoConfigServer < Sinatra::Base
   ]
 
   # Hosts we allow to access configuration without authenticating.
-  LOCALHOSTS = [
-    IPAddress.parse("127.0.0.1"),    # ipv4
-    IPAddress.parse("::ffff:127.0.0.1"),  # ipv6-mapped ipv4
-    IPAddress.parse("::1")      # ipv6
-  ]
+  LOCALHOSTS = {
+    :v4 => [
+      IPAddress.parse("127.0.0.1"),    # ipv4
+    ],
+    :v6 => [
+      IPAddress.parse("::ffff:127.0.0.1"),  # ipv6-mapped ipv4
+      IPAddress.parse("::1")      # ipv6
+    ]
+  }
 
   #set :haml, { :format => :html5, :layout => :main }
   set :erb, { :format => :html5, :layout => :main }
@@ -96,7 +100,13 @@ class ConcertoConfigServer < Sinatra::Base
 
     def request_is_local?
       ip = IPAddress.parse(request.env['REMOTE_ADDR'])
-      LOCALHOSTS.include? ip
+      if ip.ipv4?
+        LOCALHOSTS[:v4].include? ip
+      elsif ip.ipv6?
+        LOCALHOSTS[:v6].include? ip
+      else
+        false
+      end
     end
 
     # Check authorization credentials.
